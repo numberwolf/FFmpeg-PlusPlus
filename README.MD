@@ -58,25 +58,25 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             ```
 
     * MacOS
-    ```shell
-    brew install glew glfw
-    ```
+        ```shell
+        brew install glew glfw
+        ```
 
 * Compile
 
     * Download
-    ```shell
-    git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL-Shader-Filters.git
-    git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
-    
-    cd FFmpeg
-    
-    #
-    # Patch
-    #
-    cp ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/vf_plusglshader.c libavfilter/
-    git apply ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/libavfilter.diff
-    ```
+        ```shell
+        git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL-Shader-Filters.git
+        git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
+        
+        cd FFmpeg
+        
+        #
+        # Patch
+        #
+        cp ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/vf_plusglshader.c libavfilter/
+        git apply ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/libavfilter.diff
+        ```
 
     * Build
         * Needed
@@ -121,35 +121,35 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 * Check `Plus-GL-Shader`:`plusglshader` filter
     * Check
-    ```shell
-    ffmpeg -help filter=plusglshader
-    ```
+        ```shell
+        ffmpeg -help filter=plusglshader
+        ```
 
     * Output
-    ```shell
-    ffmpeg version a0d68e65 Copyright (c) 2000-2020 the FFmpeg developers
-      built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
-      configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
-      libavutil      56. 51.100 / 56. 51.100
-      libavcodec     58. 91.100 / 58. 91.100
-      libavformat    58. 45.100 / 58. 45.100
-      libavdevice    58. 10.100 / 58. 10.100
-      libavfilter     7. 85.100 /  7. 85.100
-      libswscale      5.  7.100 /  5.  7.100
-      libswresample   3.  7.100 /  3.  7.100
-      libpostproc    55.  7.100 / 55.  7.100
-    Filter plusglshader
-      Generic OpenGL shader filter
-        Inputs:
-           #0: default (video)
-        Outputs:
-           #0: default (video)
-    plusglshader AVOptions:
-      sdsource          <string>     ..FV...... gl fragment shader source path (default is render gray color)
-      vxsource          <string>     ..FV...... gl vertex shader source path (default is render gray color)
+        ```shell
+        ffmpeg version a0d68e65 Copyright (c) 2000-2020 the FFmpeg developers
+          built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
+          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
+          libavutil      56. 51.100 / 56. 51.100
+          libavcodec     58. 91.100 / 58. 91.100
+          libavformat    58. 45.100 / 58. 45.100
+          libavdevice    58. 10.100 / 58. 10.100
+          libavfilter     7. 85.100 /  7. 85.100
+          libswscale      5.  7.100 /  5.  7.100
+          libswresample   3.  7.100 /  3.  7.100
+          libpostproc    55.  7.100 / 55.  7.100
+        Filter plusglshader
+          Generic OpenGL shader filter
+            Inputs:
+               #0: default (video)
+            Outputs:
+               #0: default (video)
+        plusglshader AVOptions:
+          sdsource          <string>     ..FV...... gl fragment shader source path (default is render gray color)
+          vxsource          <string>     ..FV...... gl vertex shader source path (default is render gray color)
 
-    This filter has support for timeline through the 'enable' option.
-    ```
+        This filter has support for timeline through the 'enable' option.
+        ```
 
 * Use it (Transcoding)
 

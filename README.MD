@@ -4,7 +4,7 @@
 
 - [Filters](#ffmpeg-plus-filters)
 
-    - [FFmpeg Plus GL Shader: vf_glplusshader](#ffmpeg-plus-gl-shader)
+    - [FFmpeg OpenGL Shader Filter: vf_glplusshader](#ffmpeg-plus-gl-shader)
         
         - [File Struct](#filestruct)
         - [Build](#build)

@@ -4,6 +4,7 @@
  *          QQ: 531365872
  *          Wechat: numberwolf11
  *          Discord: numberwolf#8694
+ *          Github: https://github.com/numberwolf
  */
 #include "libavutil/opt.h"
 #include "internal.h"

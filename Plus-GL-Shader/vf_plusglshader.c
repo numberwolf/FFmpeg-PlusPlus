@@ -1,5 +1,9 @@
 /**
  * Filter for FFMpeg: Render video by your own shader files
+ * @Author  Mail:porschegt23@foxmail.com
+ *          QQ: 531365872
+ *          Wechat: numberwolf11
+ *          Discord: numberwolf#8694
  */
 #include "libavutil/opt.h"
 #include "internal.h"

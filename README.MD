@@ -156,7 +156,7 @@ You can use `plusglshader` to render frame by opengl's shader.
     * Write your own shader!
 
         * 1) Fragment shader
-            > Example: Plus-GL-Shader/test_shader.gl
+            > Example: <a href="Plus-GL-Shader/test_shader.gl">test_shader.gl</a>
 
             #### Notice: playTime is timestamp, from 0 -> end
 
@@ -175,7 +175,7 @@ You can use `plusglshader` to render frame by opengl's shader.
             ```
 
         * 2) Vertex shader
-            > Example: Plus-GL-Shader/test_vertex.gl
+            > Example: <a href="Plus-GL-Shader/test_vertex.gl">test_vertex.gl</a>
 
             ```c
             attribute vec2 position;

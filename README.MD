@@ -49,11 +49,13 @@ You can use `plusglshader` to render frame by opengl's shader.
         ```
 
         * second
-        > If on headless environments
-        > If you want to running on server machine without Video card
-        ```shell
-        yum install -y xorg-x11-server-Xvfb 
-        ```
+            > If on headless environments
+
+            > If you want to running on server machine without Video card
+
+            ```shell
+            yum install -y xorg-x11-server-Xvfb 
+            ```
 
     * MacOS
     ```shell

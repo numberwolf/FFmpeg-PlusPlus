@@ -241,6 +241,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 * If you don't know about how to compile ffmpeg, here u click in. When u did it, u can build with <a href="Plus-GL-Shader">filter `plusglshader`</a>.
     * <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">How to compile ffmpeg</a>
+    * [Build filter `plusglshader`</a>](#build)
 
 ## About ##
 

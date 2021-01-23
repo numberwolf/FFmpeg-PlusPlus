@@ -39,17 +39,17 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     * Centos 7.x+ || Linux
 
         * first
-        ```shell
-        yum install -y glew*
-        yum install -y glfw*
+            ```shell
+            yum install -y glew*
+            yum install -y glfw*
 
-        #
-        # If can not compile , you need
-        #
-        yum install -y libGLEW*
-        yum install -y mesa
-        yum install -y mesa-libGLU mesa-libGLU-devel
-        ```
+            #
+            # If can not compile , you need
+            #
+            yum install -y libGLEW*
+            yum install -y mesa
+            yum install -y mesa-libGLU mesa-libGLU-devel
+            ```
 
         * second
             > If on headless environments
@@ -59,6 +59,24 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             ```shell
             yum install -y xorg-x11-server-Xvfb 
             ```
+
+    * Ubuntu || Linux
+
+        * first
+            ```shell
+            apt-get install libglfw3-dev libglfw3
+            apt-get install libglew2.0 libglew-dev
+            ```
+
+        * second
+            > If on headless environments
+
+            > If you want to running on server machine without Video card
+
+            ```shell
+            apt-get install xvfb
+            ```
+
 
     * MacOS
         ```shell

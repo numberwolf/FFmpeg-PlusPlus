@@ -16,7 +16,7 @@
 
 Some filters for ffmpeg.
 
-You can use `plusglshader` to render frame by opengl's shader.
+You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame by opengl's shader.
 
 ## FFmpeg-Plus-Filters ##
 
@@ -24,7 +24,7 @@ You can use `plusglshader` to render frame by opengl's shader.
 
 #### FileStruct ####
 
-* PATH: Plus-GL-Shader
+* Path: <a href="Plus-GL-Shader">Plus-GL-Shader</a>
 
     * libavfilter.diff
 

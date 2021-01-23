@@ -66,7 +66,7 @@ You can use `plusglshader` to render frame by opengl's shader.
 
     * Download
     ```shell
-    git clone https://github.com/numberwolf/FFmpeg-Plus-GL-Shader.git
+    git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL-Shader-Filters.git
     git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
     
     cd FFmpeg
@@ -74,8 +74,8 @@ You can use `plusglshader` to render frame by opengl's shader.
     #
     # Patch
     #
-    cp ../FFmpeg-Plus-GL-Shader/Plus-GL-Shader/vf_plusglshader.c libavfilter/
-    git apply ../FFmpeg-Plus-GL-Shader/Plus-GL-Shader/libavfilter.diff
+    cp ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/vf_plusglshader.c libavfilter/
+    git apply ../FFmpeg-Plus-OpenGL-Shader-Filters/Plus-GL-Shader/libavfilter.diff
     ```
 
     * Build
@@ -226,7 +226,7 @@ You can use `plusglshader` to render frame by opengl's shader.
 
 * Github: 
 
-    * https://github.com/numberwolf/FFmpeg-Plus-GL-Shader
+    * https://github.com/numberwolf/FFmpeg-Plus-OpenGL-Shader-Filters
     * https://github.com/numberwolf/h265web.js
 
 * Email(porschegt23@foxmail.com)

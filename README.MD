@@ -16,7 +16,7 @@
 
 Some filters for ffmpeg.
 
-You use `plusglshader` to render frame by opengl's shader.
+You can use `plusglshader` to render frame by opengl's shader.
 
 ## FFmpeg-Plus-Filters ##
 

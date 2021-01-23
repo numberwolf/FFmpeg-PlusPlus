@@ -10,6 +10,9 @@
         - [Build](#build)
         - [Run](#run)
 
+- [Help Guide](#helpguide)
+    - [FFmpeg Guide](#ffmpegguide)
+
 - [About](#about)
 
 ## Introduce ##
@@ -231,6 +234,13 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         |-|-|-|
         | Frame | <img src="Plus-GL-Shader/example_src.png" width="500" /> | <img src="Plus-GL-Shader/example_dst.png" width="500" /> |
 
+
+## HelpGuide ##
+
+#### FFmpegGuide ####
+
+* If you don't know about how to compile ffmpeg, here u click in. When u did it, u can build with <a href="Plus-GL-Shader">filter `plusglshader`</a>.
+    * <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">How to compile ffmpeg</a>
 
 ## About ##
 

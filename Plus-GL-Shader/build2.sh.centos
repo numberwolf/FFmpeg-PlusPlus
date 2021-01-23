@@ -1,0 +1,32 @@
+#!/bin/bash
+PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig:$HOME/ffmpeg_build/lib/x265/pkgconfig" ./configure \
+  --prefix="$HOME/ffmpeg_build" \
+  --pkg-config-flags="--static" \
+  --extra-cflags="-I$HOME/ffmpeg_build/include -I$HOME/ffmpeg_build/include/x265,rpath=$HOME/ffmpeg_build/lib" \
+  --extra-ldflags="-L$HOME/ffmpeg_build/lib -L/opt/compiler/gcc-8.2/lib -L -I$HOME/ffmpeg_build/lib/x265 -lm -lz -llzma -lpthread -lrt" \
+  --extra-libs=-lpthread \
+  --extra-libs=-lm \
+  --bindir="$HOME/bin" \
+  --enable-gpl \
+  --enable-libfdk_aac \
+  --enable-libfreetype \
+  --enable-libmp3lame \
+  --enable-libopus \
+  --enable-libvpx \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-libass \
+  --enable-libfreetype       \
+  --enable-libfontconfig     \
+  --enable-libfribidi        \
+  --enable-libwebp           \
+  --enable-nonfree \
+  --disable-shared \
+  --enable-static \
+  --enable-opengl \
+  --enable-filter=genericshader \
+  --extra-libs='-lGLEW -lglfw' \
+  --enable-filter=gltransition
+make clean
+make
+make install

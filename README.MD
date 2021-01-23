@@ -152,6 +152,18 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     ```
 
 * Use it (Transcoding)
+
+    > plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'
+
+    * Params
+    
+        * `sdsource` : Fragment shader file path (Default is gray)
+        * `vxsource` : Vertex shader file path (Default is gray)
+
+    * Filter Rule
+
+        * `plusglshader`
+        * `plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'`
     
     * Write your own shader!
 
@@ -194,7 +206,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         xvfb-run -a --server-args="-screen 0 1280x720x24 -ac -nolisten tcp -dpi 96 +extension RANDR" \
         ffmpeg -v debug \
         -i 1000p10s_9k.mp4 \
-        -filter_complex "[0:v]setpts=PTS+3/TB,plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'[1outgl];[1outgl]scale=1280:-2" \
+        -filter_complex "[0:v]plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'[1outgl];[1outgl]scale=1280:-2" \
         -vcodec libx264 \
         -an \
         -pix_fmt yuv420p \
@@ -206,7 +218,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         ```shell
         ffmpeg -v debug \
         -i 1000p10s_9k.mp4 \
-        -filter_complex "[0:v]setpts=PTS+3/TB,plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'[1outgl];[1outgl]scale=1280:-2" \
+        -filter_complex "[0:v]plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'[1outgl];[1outgl]scale=1280:-2" \
         -vcodec libx264 \
         -an \
         -pix_fmt yuv420p \

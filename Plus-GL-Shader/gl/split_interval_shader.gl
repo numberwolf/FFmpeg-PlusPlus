@@ -1,0 +1,24 @@
+//precision highp float;
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+const float PI = 3.1415926;
+
+void main() {
+    //TextureCoordsVarying.x = TextureCoordsVarying.x * 0.5 + 0.5;
+    //TextureCoordsVarying.y = TextureCoordsVarying.y * 0.5 + 0.5;
+
+    vec2 uv = TextureCoordsVarying.xy;
+
+    float x_dur = 0.5;
+    float time = mod(playTime, x_dur);
+
+    float maxScale = 1.8;
+    float scale = 1.0 + (maxScale - 1.0) * time;
+
+    float weakX = 0.5 + (TextureCoordsVarying.x - 0.5) / scale;
+    float weakY = 0.5 + (TextureCoordsVarying.y - 0.5) / scale;
+
+    vec2 weakTextureCoords = vec2(weakX, weakY);
+    gl_FragColor = texture2D(tex, weakTextureCoords);
+}

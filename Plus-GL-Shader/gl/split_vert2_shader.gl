@@ -1,0 +1,20 @@
+//precision highp float;
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+
+void main() {
+    //TextureCoordsVarying.x = TextureCoordsVarying.x * 0.5 + 0.5;
+    //TextureCoordsVarying.y = TextureCoordsVarying.y * 0.5 + 0.5;
+
+    vec2 uv = TextureCoordsVarying.xy;
+
+    float y;
+    if (uv.y >= 0.0 && uv.y <= 0.5) {
+        y = uv.y + 0.25;
+    }else {
+        y = uv.y - 0.25;
+    }
+
+    gl_FragColor = texture2D(tex, vec2(uv.x, y));
+}

@@ -1,0 +1,23 @@
+//precision highp float;
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+const float PI = 3.1415926;
+
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+void main() {
+    float duration = 0.8;
+    float progressR = mod(playTime - 1.0, duration) / duration; // 0~1
+    float progressG = mod(playTime, duration) / duration; // 0~1
+    float progressB = mod(playTime + 1.0, duration) / duration; // 0~1
+
+    gl_FragColor = texture2D(tex, TextureCoordsVarying);
+    gl_FragColor.r = gl_FragColor.r * progressR;
+    gl_FragColor.g = gl_FragColor.g * progressG;
+    gl_FragColor.b = gl_FragColor.b * progressB;
+}
+
+

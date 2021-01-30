@@ -1,0 +1,19 @@
+//precision highp float;
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+const float PI = 3.1415926;
+
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+void main() {
+    float duration = 0.8;
+    float progress = mod(playTime, duration) / duration; // 0~1
+    vec4 whiteMask = vec4(1.0, 1.0, 1.0, 1.0);
+    float amplitude = abs(sin(progress * (PI / duration)));
+    
+    vec4 mask = texture2D(tex, TextureCoordsVarying); 
+    gl_FragColor = mask * (1.0 - amplitude) + whiteMask * amplitude;
+}

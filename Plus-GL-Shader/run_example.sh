@@ -18,6 +18,7 @@ if [[ -z "${FFMPEG}" ]]; then
 fi
 
 gl_shaders=(
+"sway"
 "preview"
 "jitter"
 "soul"

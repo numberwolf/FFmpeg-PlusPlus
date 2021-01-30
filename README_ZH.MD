@@ -1,6 +1,6 @@
-# FFmpeg + OpenGL (ffmpeg filter)
+# FFmpeg + OpenGL (ffmpeg 滤镜)
 
-<a href="README.MD">English</a> | <a href="README_ZH.MD">中文</a>
+## <a href="README.MD">English</a> | <a href="README_ZH.MD"><b>中文</b></a>
 <hr>
 
 - [介绍](#介绍)

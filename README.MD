@@ -1,6 +1,6 @@
 # FFmpeg + OpenGL (ffmpeg filter)
 
-<a href="README.MD">English</a> | <a href="README_ZH.MD">中文</a>
+## <a href="README.MD">English</a> | <a href="README_ZH.MD"><b>中文</b></a>
 <hr>
 
 - [Introduce](#introduce)

@@ -63,8 +63,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
         * first
             ```shell
-            yum install -y glew*
-            yum install -y glfw*
+            yum install -y glew glew-devel
+            yum install -y glfw glew-devel
+            yum install -y mesa-dri-drivers
 
             #
             # If can not compile , you need

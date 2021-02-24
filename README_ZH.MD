@@ -63,8 +63,9 @@
 
         * 第一步 安装相关依赖
             ```shell
-            yum install -y glew*
-            yum install -y glfw*
+            yum install -y glew glew-devel
+            yum install -y glfw glew-devel
+            yum install -y mesa-dri-drivers
 
             #
             # If can not compile , you need

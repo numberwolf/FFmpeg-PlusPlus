@@ -316,6 +316,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
         return AVERROR(ENOMEM);
     }
     av_frame_copy_props(out, in);
+    glfwMakeContextCurrent(gs->window);
+    glUseProgram(gs->program);
     double playTime = TS2T(out->pts, inlink->time_base);
     // check start time
     if (gs->startPlayTime < 0) {

@@ -1,1 +1,4 @@
 .DS_Store
+*.mp4
+.idea
+test.sh

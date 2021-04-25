@@ -73,6 +73,7 @@
             yum install -y libGLEW*
             yum install -y mesa
             yum install -y mesa-libGLU mesa-libGLU-devel
+            yum install -y libXfont*
             ```
 
         * 第二步（可选）
@@ -187,6 +188,7 @@
         plusglshader AVOptions:
           sdsource          <string>     ..FV...... gl fragment shader source path (default is render gray color)
           vxsource          <string>     ..FV...... gl vertex shader source path (default is render gray color)
+          duration          <duration>   ..FV...... gl render duration (default 0)
 
         This filter has support for timeline through the 'enable' option.
         ```
@@ -199,6 +201,7 @@
     
         * `sdsource` : Fragment shader file path (Default is gray)
         * `vxsource` : Vertex shader file path (Default is gray)
+        * `duration` : Shader渲染生效时长,超出部分帧不做处理
 
     * 滤镜使用规则
 

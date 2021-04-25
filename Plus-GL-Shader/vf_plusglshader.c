@@ -49,11 +49,17 @@ typedef struct {
     const AVClass *class;
     //FFFrameSync frameSync;
     double          startPlayTime;
+    AVRational      vTimebase;
 
     // @Param sdsource shader
     char            *sdsource;
     // @Param vxsource vertex
     char            *vxsource;
+    // @Param duration render
+    int64_t         duration;
+    int64_t         duration_tb;
+    double          duration_ft;
+
     // GL
     // input shader vertex
     GLchar          *sdsource_data;
@@ -73,7 +79,8 @@ typedef struct {
 #define FLAGS AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_VIDEO_PARAM
 static const AVOption plusglshader_options[] = {
     {"sdsource", "gl fragment shader source path (default is render gray color)", OFFSET(sdsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS}, 
-    {"vxsource", "gl vertex shader source path (default is render gray color)", OFFSET(vxsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS}, 
+    {"vxsource", "gl vertex shader source path (default is render gray color)", OFFSET(vxsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
+    {"duration", "gl render duration, if you set this option, must greater than zero", OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
     {NULL}
 };
 
@@ -211,7 +218,17 @@ static int build_program(AVFilterContext *ctx) {
     av_log(ctx, AV_LOG_DEBUG, 
         "doing vf_plusglshader build_program build_shader use vertex shader:\n%s\n", gl_vxsource_dst);
 
-    
+    if (gs->duration > 0) {
+        //gs->duration_tb = TS2T(gs->duration, gs->vTimebase);
+        gs->duration_tb = av_rescale_q(gs->duration, AV_TIME_BASE_Q, gs->vTimebase);
+        gs->duration_ft = TS2T(gs->duration_tb, gs->vTimebase);
+        av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader duration:%ld, duration_tb:%ld, duration_ft:%f\n",
+               gs->duration, gs->duration_tb, gs->duration_ft);
+    } else {
+        gs->duration_tb = -1;
+        gs->duration_ft = -1;
+    }
+
     av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader build_program build_shader\n");
     /*
     if (!((v_shader = build_shader(ctx, v_shader_source, GL_VERTEX_SHADER)) &&
@@ -291,6 +308,7 @@ static int config_props(AVFilterLink *inlink) {
     #endif
 
     glViewport(0, 0, inlink->w, inlink->h);
+    gs->vTimebase = inlink->time_base;
 
     int ret;
     if((ret = build_program(ctx)) < 0) {
@@ -308,29 +326,47 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
     AVFilterContext *ctx    = inlink->dst;
     // AVFilterLink *inlink    = ctx->inputs[0];
     AVFilterLink *outlink   = ctx->outputs[0];
-    PlusGLShaderContext    *gs = ctx->priv;
+    PlusGLShaderContext *gs = ctx->priv;
+
+    double playTime = TS2T(in->pts, gs->vTimebase);
+    // check start time
+    if (gs->startPlayTime < 0) {
+        gs->startPlayTime = playTime;
+    }
+    playTime -= gs->startPlayTime;
+    av_log(ctx, AV_LOG_DEBUG,
+           "start vf_plusglshader filter_frame get pts:%ld ,time->%f, duration:%f\n", in->pts, playTime, gs->duration_ft);
 
     AVFrame *out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
     if (!out) {
         av_frame_free(&in);
         return AVERROR(ENOMEM);
     }
-    av_frame_copy_props(out, in);
-    double playTime = TS2T(out->pts, inlink->time_base);
-    // check start time
-    if (gs->startPlayTime < 0) {
-        gs->startPlayTime = playTime;
+
+    int copy_props_ret = av_frame_copy_props(out, in);
+    if (copy_props_ret < 0) {
+        av_frame_free(&out);
+        return -1;
     }
-    playTime -= gs->startPlayTime;
 
-    av_log(ctx, AV_LOG_DEBUG, 
-        "start vf_plusglshader filter_frame get pts:%ld ,time->%f\n", out->pts, playTime);
-    // @TODO
-    glUniform1f(gs->playTime, playTime);
+    if (gs->duration_ft < 0 || (gs->duration_ft > 0 && playTime <= gs->duration_ft)) {
+        av_log(ctx, AV_LOG_DEBUG,
+               "doing vf_plusglshader filter_frame gl render pts:%ld ,time->%f, duration:%f\n", in->pts, playTime);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, in->data[0]);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glReadPixels(0, 0, outlink->w, outlink->h, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *)out->data[0]);
+        // @TODO
+        glUniform1f(gs->playTime, playTime);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, in->data[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glReadPixels(0, 0, outlink->w, outlink->h, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *) out->data[0]);
+
+    } else {
+        av_log(ctx, AV_LOG_DEBUG,
+               "doing vf_plusglshader filter_frame copy pts:%ld ,time->%f, duration:%f\n", in->pts, playTime);
+        av_frame_copy(out, in);
+    }
+
+
     av_frame_free(&in);
     return ff_filter_frame(outlink, out);
 }

@@ -364,7 +364,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
 
     } else {
         av_log(ctx, AV_LOG_DEBUG,
-               "doing vf_plusglshader filter_frame copy pts:%ld ,time->%f, duration:%f\n", in->pts, playTime);
+               "doing vf_plusglshader filter_frame copy pts:%ld ,time->%f, duration:%f\n", in->pts, playTime, gs->duration_ft);
         av_frame_copy(out, in);
     }
 

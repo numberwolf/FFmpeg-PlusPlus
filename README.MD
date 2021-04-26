@@ -73,6 +73,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             yum install -y libGLEW*
             yum install -y mesa
             yum install -y mesa-libGLU mesa-libGLU-devel
+            yum install -y libXfont*
             ```
 
         * second
@@ -192,6 +193,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         plusglshader AVOptions:
           sdsource          <string>     ..FV...... gl fragment shader source path (default is render gray color)
           vxsource          <string>     ..FV...... gl vertex shader source path (default is render gray color)
+          duration          <duration>   ..FV...... gl render duration (default 0)
+
 
         This filter has support for timeline through the 'enable' option.
         ```
@@ -204,6 +207,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     
         * `sdsource` : Fragment shader file path (Default is gray)
         * `vxsource` : Vertex shader file path (Default is gray)
+        * `duration` : GL Render duration
 
     * Filter Rule
 

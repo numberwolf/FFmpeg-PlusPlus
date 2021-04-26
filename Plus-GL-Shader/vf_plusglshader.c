@@ -348,6 +348,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
         av_frame_free(&out);
         return -1;
     }
+    glfwMakeContextCurrent(gs->window);
+    glUseProgram(gs->program);
 
     if (gs->duration_ft < 0 || (gs->duration_ft > 0 && playTime <= gs->duration_ft)) {
         av_log(ctx, AV_LOG_DEBUG,

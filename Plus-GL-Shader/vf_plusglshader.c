@@ -351,7 +351,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
 
     if (gs->duration_ft < 0 || (gs->duration_ft > 0 && playTime <= gs->duration_ft)) {
         av_log(ctx, AV_LOG_DEBUG,
-               "doing vf_plusglshader filter_frame gl render pts:%ld ,time->%f, duration:%f\n", in->pts, playTime);
+               "doing vf_plusglshader filter_frame gl render pts:%ld ,time->%f, duration:%f\n", in->pts, playTime, gs->duration_ft);
 
         // @TODO
         glUniform1f(gs->playTime, playTime);

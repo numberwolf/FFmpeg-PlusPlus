@@ -1,36 +1,36 @@
-# FFmpeg + OpenGL (ffmpeg filter)
+# FFmpeg + OpenGL (ffmpeg 滤镜)
 
-## <a href="README.MD">English</a> | <a href="README_ZH.MD"><b>中文</b></a>
+## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
 <hr>
 
-- [Introduce](#introduce)
-    - [Example](#example)
+- [介绍](#介绍)
+    - [使用示例展示](#使用示例展示)
 
-- [How to Use FFmpeg+OpenGL Shader Filter: vf_glplusshader](#ffmpeg-plus-gl-shader)
+- [如何使用 FFmpeg+OpenGL Shader Filter: vf_glplusshader](#ffmpeg-plus-gl-shader)
     
-    - [File Struct](#filestruct)
-    - [Build](#build)
-    - [Run](#run)
+    - [目录结构](#目录结构)
+    - [编译构建](#编译构建)
+    - [运行](#运行)
 
-- [Help Guide](#helpguide)
-    - [FFmpeg Guide](#ffmpegguide)
+- [相关帮助](#相关帮助)
+    - [FFmpeg编译相关帮助 - 如果不知道FFmpeg是如何编译怎么办](#FFmpeg编译相关帮助)
 
-- [About](#about)
+- [关于](#关于)
 
-## Introduce ##
+## 介绍 ##
 
-OpenGL filter for ffmpeg.
+一个可以在FFmpeg cmd里使用的OpenGL滤镜，可以自己写shader并且动态加载渲染。
 
-You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame by opengl's shader.
+可以使用 <a href="Plus-GL-Shader">滤镜 `plusglshader`</a> 来渲染你的视频。
 
 
-### Example ###
+### 使用示例展示 ###
 
-* Script <a href="Plus-GL-Shader/run_example.sh">`Plus-GL-Shader/run_example.sh`</a>
+* 示例脚本 <a href="Plus-GL-Shader/run_example.sh">`Plus-GL-Shader/run_example.sh`</a>
 
-* Shaders: <a href="Plus-GL-Shader/gl">`See Example Shaders ./Plus-GL-Shader/gl`</a>
+* 示例Shaders: <a href="Plus-GL-Shader/gl">`示例Shader目录 ./Plus-GL-Shader/gl`</a>
 
-* Show
+* 效果如下
 
 | shader name | source | render |
 | - | - | - |
@@ -48,7 +48,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 ## FFmpeg-Plus-GL-Shader ##
 
-### FileStruct ###
+### 目录结构 ###
 
 * Filter Source Code Path: <a href="Plus-GL-Shader">Plus-GL-Shader</a>
 
@@ -56,12 +56,12 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
     * vf_plusglshader.c
 
-### Build ###
+### 编译构建 ###
 
-* Dependencies
+* 相关依赖
     * Centos 7.x+ || Linux
 
-        * first
+        * 第一步 安装相关依赖
             ```shell
             yum install -y glew glew-devel
             yum install -y glfw glew-devel
@@ -76,10 +76,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             yum install -y libXfont*
             ```
 
-        * second
-            > If on headless environments
-
-            > If you want to running on server machine without Video card
+        * 第二步（可选）
+            > 如果你在无显卡环境下跑此滤镜（比如你的生产环境服务器）,需要xvfb的支持
 
             ```shell
             yum install -y xorg-x11-server-Xvfb 
@@ -87,30 +85,27 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
     * Ubuntu || Linux
 
-        * first
+        * 第一步 安装相关依赖
             ```shell
             apt-get install libglfw3-dev libglfw3
             apt-get install libglew2.0 libglew-dev
             ```
 
-        * second
-            > If on headless environments
-
-            > If you want to running on server machine without Video card
+        * 第二步（可选）
+            > 如果你在无显卡环境下跑此滤镜（比如你的生产环境服务器）,需要xvfb的支持
 
             ```shell
             apt-get install xvfb
             ```
 
-
-    * MacOS
+    * MacOS下编译 （需要brew支持）
         ```shell
         brew install glew glfw
         ```
 
-* Compile
+* 编译构建
 
-    * Download
+    * 下载源码
         ```shell
         git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL.git
         git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
@@ -124,13 +119,13 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         git apply ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/libavfilter.diff
         ```
 
-    * Build
-        * Needed
+    * 编译
+        * 编译的`必选项` - 和此滤镜相关
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
             > --enable-filter=plusglshader
 
-        * Example
+        * 编译示例 - 可以不参考此示例，但是必须加上`必选项`
             ```shell
             #!/bin/bash
             ./configure \
@@ -163,15 +158,15 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             make install
             ```
 
-### Run ###
+### 运行 ###
 
-* Check `Plus-GL-Shader`:`plusglshader` filter
-    * Check
+* 检查 `Plus-GL-Shader`:`plusglshader` 滤镜是否安装成功
+    * 检查命令
         ```shell
         ffmpeg -help filter=plusglshader
         ```
 
-    * Output
+    * 正确输出
         ```shell
         ffmpeg version a0d68e65 Copyright (c) 2000-2020 the FFmpeg developers
           built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
@@ -193,28 +188,45 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         plusglshader AVOptions:
           sdsource          <string>     ..FV...... gl fragment shader source path (default is render gray color)
           vxsource          <string>     ..FV...... gl vertex shader source path (default is render gray color)
-          duration          <duration>   ..FV...... gl render duration (default 0)
-
+          start             <duration>   ..FV...... gl render start timestamp, if you set this option, must greater than zero(no trim) (default 0)
+          duration          <duration>   ..FV...... gl render duration, if you set this option, must greater than zero(no trim) (default 0)
+        
+        This filter has support for timeline through the 'enable' option.
 
         This filter has support for timeline through the 'enable' option.
         ```
 
-* Use it (Transcoding)
+* 使用`plusglfilter`转码渲染 (Transcoding)
 
     > plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'
 
-    * Params
+    * 参数项
     
         * `sdsource` : Fragment shader file path (Default is gray)
         * `vxsource` : Vertex shader file path (Default is gray)
-        * `duration` : GL Render duration
+        * `start` : Shader渲染生效起始时间点
+        * `duration` : Shader渲染生效时长,超出部分帧不做处理
 
-    * Filter Rule
+    * 滤镜使用规则 - 示例
 
         * `plusglshader`
         * `plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'`
+        * `plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl':duration=10`
+        * `plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl':start=5:duration=10`
+        * 多个`plusglshader`渲染示例
+            ```bash
+            ffmpeg -v debug \
+            -ss 40 -t 15 -i /Users/numberwolf/Documents/webroot/VideoMissile/VideoMissilePlayer/demo/res/cg.mp4 \
+            -filter_complex \
+            "plusglshader=sdsource=gl/jitter_shader.gl:vxsource=gl/jitter_vertex.gl:duration=10.1[out1];
+            [out1]plusglshader=sdsource=gl/sway_shader.gl:vxsource=gl/sway_vertex.gl:duration=5[out2];
+            [out2]plusglshader=sdsource=gl/split_9_shader.gl:vxsource=gl/split_9_vertex.gl:start=3:duration=3" \
+            -vcodec libx264 \
+            -an \
+            -f mp4 -y output.mp4
+            ```
     
-    * Write your own shader!
+    * 用你自己的Shader渲染
 
         * 1) Fragment shader
             > Example: <a href="Plus-GL-Shader/test_shader.gl">test_shader.gl</a>
@@ -247,9 +259,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             }
             ```
 
-    * Running with out video card || headless env
+    * 如果在无头（无显示器显卡环境下）环境下使用
 
-        > You need xvfb
+        > 你需要xvfb server支持,使用如下命令
 
         ```shell
         xvfb-run -a --server-args="-screen 0 1280x720x24 -ac -nolisten tcp -dpi 96 +extension RANDR" \
@@ -262,7 +274,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         -y test.mp4
         ```
 
-    * Running with video card
+    * 在有头（显卡 显示器）环境下运行
 
         ```shell
         ffmpeg -v debug \
@@ -274,22 +286,22 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         -y test.mp4
         ```
 
-    * Output Example
+    * 输出示例
 
         | Tag | Src | Dst |
         |-|-|-|
         | Frame | <img src="Plus-GL-Shader/example_src.png" width="500" /> | <img src="Plus-GL-Shader/example_dst.png" width="500" /> |
 
 
-## HelpGuide ##
+## 相关帮助 ##
 
-#### FFmpegGuide ####
+#### FFmpeg编译相关帮助 ####
 
-* If you don't know about how to compile ffmpeg, here u click in. When u did it, u can build with <a href="Plus-GL-Shader">filter `plusglshader`</a>.
-    * <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">How to compile ffmpeg</a>
-    * [Build filter `plusglshader`</a>](#build)
+* <a href="Plus-GL-Shader">filter `plusglshader`</a>.
+    * <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">如果你不知道如何编译FFmpeg，请点这里</a>
+    * [学会之后可以编译我们的 `plusglshader`</a>](#build)
 
-## About ##
+## 关于 ##
 
 #### Contact
 

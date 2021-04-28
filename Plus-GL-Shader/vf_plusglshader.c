@@ -55,6 +55,10 @@ typedef struct {
     char            *sdsource;
     // @Param vxsource vertex
     char            *vxsource;
+    // @Param start render
+    int64_t         r_start_time;
+    int64_t         r_start_time_tb;
+    double          r_start_time_ft;
     // @Param duration render
     int64_t         duration;
     int64_t         duration_tb;
@@ -80,7 +84,8 @@ typedef struct {
 static const AVOption plusglshader_options[] = {
     {"sdsource", "gl fragment shader source path (default is render gray color)", OFFSET(sdsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS}, 
     {"vxsource", "gl vertex shader source path (default is render gray color)", OFFSET(vxsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
-    {"duration", "gl render duration, if you set this option, must greater than zero", OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
+    {"start", "gl render start timestamp, if you set this option, must greater than zero(no trim)", OFFSET(r_start_time), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
+    {"duration", "gl render duration, if you set this option, must greater than zero(no trim)", OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
     {NULL}
 };
 
@@ -218,16 +223,28 @@ static int build_program(AVFilterContext *ctx) {
     av_log(ctx, AV_LOG_DEBUG, 
         "doing vf_plusglshader build_program build_shader use vertex shader:\n%s\n", gl_vxsource_dst);
 
+    if (gs->r_start_time > 0) {
+        //gs->duration_tb = TS2T(gs->duration, gs->vTimebase);
+        gs->r_start_time_tb = av_rescale_q(gs->r_start_time, AV_TIME_BASE_Q, gs->vTimebase);
+        gs->r_start_time_ft = TS2T(gs->r_start_time_tb, gs->vTimebase);
+        gs->duration += gs->r_start_time;
+    } else {
+        gs->duration_tb = 0;
+        gs->duration_ft = 0;
+    }
+    av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader r_start_time:%ld, r_start_time_tb:%ld, r_start_time_ft:%f\n",
+           gs->r_start_time, gs->r_start_time_tb, gs->r_start_time_ft);
+
     if (gs->duration > 0) {
         //gs->duration_tb = TS2T(gs->duration, gs->vTimebase);
         gs->duration_tb = av_rescale_q(gs->duration, AV_TIME_BASE_Q, gs->vTimebase);
         gs->duration_ft = TS2T(gs->duration_tb, gs->vTimebase);
-        av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader duration:%ld, duration_tb:%ld, duration_ft:%f\n",
-               gs->duration, gs->duration_tb, gs->duration_ft);
     } else {
         gs->duration_tb = -1;
         gs->duration_ft = -1;
     }
+    av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader duration:%ld, duration_tb:%ld, duration_ft:%f\n",
+           gs->duration, gs->duration_tb, gs->duration_ft);
 
     av_log(ctx, AV_LOG_DEBUG, "doing vf_plusglshader build_program build_shader\n");
     /*
@@ -351,11 +368,13 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
     glfwMakeContextCurrent(gs->window);
     glUseProgram(gs->program);
 
-    if (gs->duration_ft < 0 || (gs->duration_ft > 0 && playTime <= gs->duration_ft)) {
+    if ( // check if render
+            (gs->duration_ft < 0 || (gs->duration_ft > 0 && playTime <= gs->duration_ft))
+            && playTime >= gs->r_start_time_ft)
+    {
         av_log(ctx, AV_LOG_DEBUG,
                "doing vf_plusglshader filter_frame gl render pts:%ld ,time->%f, duration:%f\n", in->pts, playTime, gs->duration_ft);
 
-        // @TODO
         glUniform1f(gs->playTime, playTime);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, in->data[0]);

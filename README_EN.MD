@@ -1,4 +1,6 @@
-# FFmpeg + OpenGL (ffmpeg filter)
+# FFmpeg + OpenGL(GLSL) - For video edit rendering
+
+> Make your FFmpeg support GLSL - Graphic Rendering
 
 ## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
 <hr>
@@ -34,6 +36,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 | shader name | source | render |
 | - | - | - |
+| Fragments Shader: <br><a href="Plus-GL-Shader/gl/light_shader.gl">Plus-GL-Shader/gl/light_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/light_vertex.gl">Plus-GL-Shader/gl/light_vertex.gl</a> | <img src="Plus-GL-Shader/city720p.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/light.gif" width="300" /> |
+| Fragments Shader: <br><a href="Plus-GL-Shader/gl/mirror_shader.gl">Plus-GL-Shader/gl/mirror_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/mirror_vertex.gl">Plus-GL-Shader/gl/mirror_vertex.gl</a> | <img src="Plus-GL-Shader/cg.gif" width="300" /> | <img src="Plus-GL-Shader/example_show/mirror.gif" width="300" /> |
 | Fragments Shader: <br><a href="Plus-GL-Shader/gl/sway_shader.gl">Plus-GL-Shader/gl/sway_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/sway_vertex.gl">Plus-GL-Shader/gl/sway_vertex.gl</a> | <img src="Plus-GL-Shader/cat_quqi.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/sway.gif" width="300" /> |
 | Fragments Shader: <br><a href="Plus-GL-Shader/gl/jitter_shader.gl">Plus-GL-Shader/gl/jitter_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/jitter_vertex.gl">Plus-GL-Shader/gl/jitter_vertex.gl</a> | <img src="Plus-GL-Shader/cat_quqi.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/jitter.gif" width="300" /> |
 | Fragments Shader: <br><a href="Plus-GL-Shader/gl/preview_shader.gl">Plus-GL-Shader/gl/preview_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/preview_vertex.gl">Plus-GL-Shader/gl/preview_vertex.gl</a> | <img src="Plus-GL-Shader/cat_quqi.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/preview.gif" width="300" /> |

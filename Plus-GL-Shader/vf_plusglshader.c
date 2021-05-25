@@ -65,6 +65,7 @@ typedef struct {
     double          duration_ft;
 
     // GL
+    unsigned char   *lut_rgb;
     // input shader vertex
     GLchar          *sdsource_data;
     GLchar          *vxsource_data;
@@ -72,6 +73,7 @@ typedef struct {
     // GL Obj
     GLuint          program;
     GLuint          frame_tex;
+    GLuint          lut_tex;
     GLFWwindow      *window;
     GLuint          pos_buf;
 } PlusGLShaderContext;
@@ -118,31 +120,86 @@ static GLuint build_shader(AVFilterContext *ctx, const GLchar *shader_source, GL
 }
 
 static void vbo_setup(PlusGLShaderContext *gs) {
-  glGenBuffers(1, &gs->pos_buf);
-  glBindBuffer(GL_ARRAY_BUFFER, gs->pos_buf);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
+    glGenBuffers(1, &gs->pos_buf);
+    glBindBuffer(GL_ARRAY_BUFFER, gs->pos_buf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(position), position, GL_STATIC_DRAW);
 
-  GLint loc = glGetAttribLocation(gs->program, "position");
-  glEnableVertexAttribArray(loc);
-  glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    GLint loc = glGetAttribLocation(gs->program, "position");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 static void tex_setup(AVFilterLink *inlink) {
-  AVFilterContext     *ctx = inlink->dst;
-  PlusGLShaderContext *gs = ctx->priv;
+    AVFilterContext     *ctx = inlink->dst;
+    PlusGLShaderContext *gs = ctx->priv;
 
-  glGenTextures(1, &gs->frame_tex);
-  glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &gs->frame_tex);
+    glActiveTexture(GL_TEXTURE0);
 
-  glBindTexture(GL_TEXTURE_2D, gs->frame_tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, gs->frame_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
 
-  glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
+    glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
+}
+
+static int tex_setup_lut(AVFilterLink *inlink, const char* lut_path) {
+    AVFilterContext     *ctx = inlink->dst;
+    PlusGLShaderContext *gs = ctx->priv;
+
+
+    FILE *f = fopen(lut_path, "rb");
+    if (!f) {
+        av_log(ctx, AV_LOG_ERROR,
+               "doing vf_plusglshader tex_setup_lut: invalid lut path \"%s\"\n", lut_path);
+        return -1;
+    }
+
+    // get file size
+    fseek(f, 0, SEEK_END);
+    unsigned long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    gs->lut_rgb = malloc(fsize + 1);
+    fread(gs->lut_rgb, fsize, 1, f);
+    fclose(f);
+    gs->lut_rgb[fsize] = 0;
+
+
+    FILE *fw = fopen("./test.rgb", "wb");
+    fwrite(gs->lut_rgb, 1, fsize, fw);
+    fclose(fw);
+
+    glGenTextures(1, &gs->lut_tex);
+    glActiveTexture(GL_TEXTURE1);
+
+    //glBindTexture(GL_TEXTURE_3D,  gs->lut_tex);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, 32, 32, 32, 0, GL_RGB,
+    //             GL_UNSIGNED_BYTE, gs->lut_rgb);
+
+    glBindTexture(GL_TEXTURE_2D,  gs->lut_tex);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, gs->lut_rgb);
+
+    glUniform1i(glGetUniformLocation(gs->program, "tex2"), 1);
+
+    return 0;
 }
 
 /**
@@ -335,6 +392,7 @@ static int config_props(AVFilterLink *inlink) {
     glUseProgram(gs->program);
     vbo_setup(gs);
     tex_setup(inlink);
+    //tex_setup_lut(inlink, "./lut.rgb");
     uni_setup(inlink);
     return 0;
 }

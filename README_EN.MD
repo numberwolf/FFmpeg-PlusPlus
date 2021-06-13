@@ -1,6 +1,15 @@
 # FFmpeg + OpenGL(GLSL) - For video edit rendering
 
-> Make your FFmpeg support GLSL - Graphic Rendering
+#### Make your FFmpeg support GLSL - Graphic Rendering
+
+> `Shader++` is a web(pc) develop application for this AVFilter:
+>
+> You can write and make your shaders on `Shader++`, then make it running with `FFmpeg-Plus-Opengl`
+>
+> https://www.zzsin.com/shaderplus.html
+>
+> <img src="Plus-GL-Shader/web.jpg" width="500px" />
+
 
 ## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
 <hr>

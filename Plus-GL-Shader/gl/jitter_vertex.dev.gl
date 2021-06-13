@@ -1,0 +1,25 @@
+attribute vec2 position;
+varying vec2 TextureCoordsVarying;
+const float PI = 3.1415926;
+uniform float playTime;
+
+void main(void) {
+    TextureCoordsVarying.x = position.x * 0.5 + 0.5;
+    TextureCoordsVarying.y = position.y * 0.5 + 0.5;
+
+    float duration = 10.0;
+    float progress = mod(playTime, duration) / duration; // 0~1
+    float rotate = 360.0 * progress;
+    float radians = rotate * PI / 180.0;
+    float s = sin(radians);
+    float c = cos(radians);
+
+    mat4 zRotation = mat4(
+        c, 		-s, 	0.0, 	0.0,
+        s, 		c, 		0.0, 	0.0,
+        0.0, 	0.0, 	1.0, 	0.0,
+        0.0, 	0.0, 	0.0, 	1.0
+    );
+
+    gl_Position = zRotation * vec4(position, 0, 1);
+}

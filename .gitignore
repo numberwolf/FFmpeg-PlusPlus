@@ -3,7 +3,5 @@
 .idea
 test.sh
 vf_plusglshader.c.bak
-Plus-GL-Shader/test.rgb
-Plus-GL-Shader/lut.rgb
-Plus-GL-Shader/run.sh
 newshader
+Plus-GL-Shader.bak*

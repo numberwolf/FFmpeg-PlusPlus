@@ -361,6 +361,14 @@ static void uni_setup(AVFilterLink *inLink) {
 }
 
 static av_cold int init(AVFilterContext *ctx) {
+    av_log(ctx, AV_LOG_INFO, "/**\n");
+    av_log(ctx, AV_LOG_INFO, " * OpenGL Shader Filter for FFMpeg: Render video by your own shader files\n");
+    av_log(ctx, AV_LOG_INFO, " * @Author  Mail:porschegt23@foxmail.com\n");
+    av_log(ctx, AV_LOG_INFO, " *          QQ: 531365872\n");
+    av_log(ctx, AV_LOG_INFO, " *          Wechat: numberwolf11\n");
+    av_log(ctx, AV_LOG_INFO, " *          Discord: numberwolf#8694\n");
+    av_log(ctx, AV_LOG_INFO, " *          Github: https://github.com/numberwolf\n");
+    av_log(ctx, AV_LOG_INFO, " */\n");
   return glfwInit() ? 0 : -1;
 }
 

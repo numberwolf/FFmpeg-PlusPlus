@@ -24,9 +24,9 @@ PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig:$HOME/f
   --disable-shared \
   --enable-static \
   --enable-opengl \
-  --enable-filter=genericshader \
-  --extra-libs='-lGLEW -lglfw' \
-  --enable-filter=gltransition
+  --enable-filter=plusglshader \
+  --enable-filter=lutglshader \
+  --extra-libs='-lGLEW -lglfw'
 make clean
 make
 make install

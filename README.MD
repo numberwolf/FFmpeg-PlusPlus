@@ -148,7 +148,8 @@
         * 编译的`必选项` - 和此滤镜相关
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
-            > --enable-filter=plusglshader
+            > --enable-filter=plusglshader \   
+            > --enable-filter=lutglshader
 
         * 编译示例 - 可以不参考此示例，但是必须加上`必选项`
             ```shell

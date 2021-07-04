@@ -155,7 +155,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         * Needed
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
-            > --enable-filter=plusglshader
+            > --enable-filter=plusglshader \
+            > --enable-filter=lutglshader
 
         * Example
             ```shell

@@ -130,7 +130,9 @@
     * 下载源码
         ```shell
         git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL.git
-        git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
+      
+        git clone https://github.com/FFmpeg/FFmpeg.git # for 4.1x ~ 4.3x
+        # 或者: wget -O ffmpeg.tar.gz "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.3.1.tar.gz"
         
         cd FFmpeg
         
@@ -138,6 +140,7 @@
         # Patch
         #
         cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_plusglshader.c libavfilter/
+        cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_lutglshader.c libavfilter/
         git apply ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/libavfilter.diff
         ```
 
@@ -145,7 +148,8 @@
         * 编译的`必选项` - 和此滤镜相关
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
-            > --enable-filter=plusglshader
+            > --enable-filter=plusglshader \   
+            > --enable-filter=lutglshader
 
         * 编译示例 - 可以不参考此示例，但是必须加上`必选项`
             ```shell

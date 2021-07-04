@@ -137,7 +137,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     * Download
         ```shell
         git clone https://github.com/numberwolf/FFmpeg-Plus-OpenGL.git
-        git clone https://github.com/FFmpeg/FFmpeg.git # for 4.x+
+      
+        git clone https://github.com/FFmpeg/FFmpeg.git # for 4.1x~4.3x
+        # OR: wget -O ffmpeg.tar.gz "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n4.3.1.tar.gz"
         
         cd FFmpeg
         
@@ -145,6 +147,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         # Patch
         #
         cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_plusglshader.c libavfilter/
+        cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_lutglshader.c libavfilter/
         git apply ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/libavfilter.diff
         ```
 
@@ -152,7 +155,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         * Needed
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
-            > --enable-filter=plusglshader
+            > --enable-filter=plusglshader \
+            > --enable-filter=lutglshader
 
         * Example
             ```shell

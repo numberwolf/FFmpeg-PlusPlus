@@ -40,6 +40,8 @@
 
 | 更新日志 | 内容 |
 | ---- | ---- |
+| 时间 | 2021/07/06 |
+| - | 1.filter兼容FFMpeg仓库最新版本 |
 | 时间 | 2021/06/26 |
 | - | 1.增加lut贴纸能力 |
 
@@ -79,6 +81,8 @@
     * libavfilter.diff
 
     * vf_plusglshader.c
+    
+    * vf_lutglshader.c
 
 ### 编译构建 ###
 

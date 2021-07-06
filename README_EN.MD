@@ -42,6 +42,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 ### UpldateLog ###
 
 | UpldateLog | Content |
+| Time | 2021/07/06 |
+| - | 1.lutglshader is upward compatible with the newest ffmpeg.git's code |
 | ---- | ---- |
 | Time | 2021/06/26 |
 | - | 1.Support Lut look-up-table filter |
@@ -81,6 +83,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     * libavfilter.diff
 
     * vf_plusglshader.c
+    
+    * vf_lutglshader.c
 
 ### Build ###
 

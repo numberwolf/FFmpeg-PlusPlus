@@ -9,6 +9,7 @@
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 #include "libavutil/pixdesc.h"
 
 #include "libavutil/opt.h"
@@ -240,7 +241,7 @@ static int open_ext_source(AVFilterLink *inlink) {
             AVStream *contex_stream = m_formatCtx->streams[i];
             enum AVCodecID codecId = contex_stream->codecpar->codec_id;
 
-            if (contex_stream->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+            if (contex_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
                 vIndex = i;
 
                 double m_vTimebase = av_q2d(contex_stream->time_base);
@@ -341,10 +342,14 @@ static int open_ext_source(AVFilterLink *inlink) {
                                 int rgb24size = outFrame->width * outFrame->height * 3;
 
                                 out_buffer = (uint8_t *)av_malloc((int)(rgb24size) * sizeof(uint8_t));
-                                avpicture_fill(
-                                        (AVPicture *)outFrame, out_buffer,
-                                        AV_PIX_FMT_RGB24,
-                                        m_frame->width, m_frame->height);
+                                //avpicture_fill(
+                                //        (AVPicture *)outFrame, out_buffer,
+                                //        AV_PIX_FMT_RGB24,
+                                //        m_frame->width, m_frame->height);
+
+                                // filllen =
+                                av_image_fill_arrays(outFrame->data, outFrame->linesize,
+                                                     out_buffer, AV_PIX_FMT_RGB24, m_frame->width, m_frame->height, 1);
 
                                 sws_scale(swCtx,
                                           (const uint8_t* const*)m_frame->data,

@@ -1,5 +1,7 @@
 # FFmpeg + OpenGL(GLSL) - 视频编辑增强能力
 
+<img src="./assets/logo_plusopengl.png" width="300px" />
+
 #### 让FFmpeg拥有GLSL图形渲染能力
 
 > `Shader++`是此AVFilter的`Shader在线调试`工具：(编写的Shader可与本AVFilter公用)

@@ -1,4 +1,4 @@
-# FFmpeg + OpenGL(GLSL) - 视频编辑增强能力
+# FFmpeg + OpenGL(GLSL) - 视频编辑增强能力 
 
 <img src="./assets/logo_plusopengl.png" width="300px" />
 

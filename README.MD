@@ -1,4 +1,4 @@
-# FFmpeg + OpenGL(GLSL) - 视频编辑增强能力
+# FFmpeg + OpenGL(GLSL) - 视频编辑增强能力 
 
 <img src="./assets/logo_plusopengl.png" width="300px" />
 
@@ -170,15 +170,7 @@
               --enable-libfdk_aac \
               --enable-libfreetype \
               --enable-libmp3lame \
-              --enable-libopus \
-              --enable-libvpx \
               --enable-libx264 \
-              --enable-libx265 \
-              --enable-libass \
-              --enable-libfreetype       \
-              --enable-libfontconfig     \
-              --enable-libfribidi        \
-              --enable-libwebp           \
               --enable-nonfree \
               --disable-shared \
               --enable-static \

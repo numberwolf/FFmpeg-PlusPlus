@@ -43,13 +43,15 @@ static const GLchar *f_shader_source =
   "  gl_FragColor.b = gray;\n"
   "}\n";
 
-#define PIXEL_FORMAT GL_RGB
-
 typedef struct {
     const AVClass *class;
     //FFFrameSync frameSync;
     double          startPlayTime;
     AVRational      vTimebase;
+
+    //判断通道值
+    int alpha;
+    int pix_fmt;
 
     // @Param sdsource shader
     char            *sdsource;
@@ -92,6 +94,11 @@ static const AVOption plusglshader_options[] = {
 };
 
 AVFILTER_DEFINE_CLASS(plusglshader);
+
+static const enum AVPixelFormat alpha_pix_fmts[] = {
+    AV_PIX_FMT_ARGB, AV_PIX_FMT_ABGR, AV_PIX_FMT_RGBA,
+    AV_PIX_FMT_BGRA, AV_PIX_FMT_NONE
+};
 
 static GLuint build_shader(AVFilterContext *ctx, const GLchar *shader_source, GLenum type) {
     GLuint shader = glCreateShader(type);
@@ -142,7 +149,7 @@ static void tex_setup(AVFilterLink *inlink) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, inlink->w, inlink->h, 0, gs->pix_fmt, GL_UNSIGNED_BYTE, NULL);
 
     glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
 }
@@ -194,7 +201,7 @@ static int tex_setup_lut(AVFilterLink *inlink, const char* lut_path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB,
+    glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, 512, 512, 0, gs->pix_fmt,
                  GL_UNSIGNED_BYTE, gs->lut_rgb);
 
     glUniform1i(glGetUniformLocation(gs->program, "tex2"), 1);
@@ -377,6 +384,16 @@ static int config_props(AVFilterLink *inlink) {
     AVFilterContext     *ctx    = inlink->dst;
     PlusGLShaderContext *gs    = ctx->priv;
 
+    gs->alpha = ff_fmt_is_in(inlink->format, alpha_pix_fmts);
+    av_log(ctx, AV_LOG_DEBUG, "gs->alpha: %d, inlink->format: %d\n", gs->alpha, inlink->format);
+
+    //get alpha info
+    if (gs->alpha) {
+        gs->pix_fmt = GL_RGBA;
+    } else {
+        gs->pix_fmt = GL_RGB;
+    }
+
     gs->startPlayTime           = -1;
 
     glfwWindowHint(GLFW_VISIBLE, 0);
@@ -443,9 +460,9 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
 
         glUniform1f(gs->playTime, playTime);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, inlink->w, inlink->h, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, in->data[0]);
+        glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, inlink->w, inlink->h, 0, gs->pix_fmt, GL_UNSIGNED_BYTE, in->data[0]);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glReadPixels(0, 0, outlink->w, outlink->h, PIXEL_FORMAT, GL_UNSIGNED_BYTE, (GLvoid *) out->data[0]);
+        glReadPixels(0, 0, outlink->w, outlink->h, gs->pix_fmt, GL_UNSIGNED_BYTE, (GLvoid *) out->data[0]);
 
     } else {
         av_log(ctx, AV_LOG_DEBUG,
@@ -498,8 +515,19 @@ static av_cold void uninit(AVFilterContext *ctx) {
 
 
 static int query_formats(AVFilterContext *ctx) {
-  static const enum AVPixelFormat formats[] = {AV_PIX_FMT_RGB24, AV_PIX_FMT_NONE};
-  return ff_set_common_formats(ctx, ff_make_format_list(formats));
+  static const enum AVPixelFormat pix_fmts[] = {
+        AV_PIX_FMT_RGB24,    AV_PIX_FMT_BGR24,
+        AV_PIX_FMT_ARGB,     AV_PIX_FMT_ABGR,
+        AV_PIX_FMT_RGBA,     AV_PIX_FMT_BGRA,
+        AV_PIX_FMT_NONE
+    };
+    AVFilterFormats *fmts_list;
+
+    fmts_list = ff_make_format_list(pix_fmts);
+    if (!fmts_list) {
+      return AVERROR(ENOMEM);
+    }
+    return ff_set_common_formats(ctx, fmts_list);
 }
 
 static const AVFilterPad plusglshader_inputs[] = {

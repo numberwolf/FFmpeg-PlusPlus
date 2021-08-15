@@ -495,6 +495,8 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 * QQ: 531365872
 
+* QQ Group number: 925466059
+
 * Discord:numberwolf#8694
 
 * Wechat:numberwolf11

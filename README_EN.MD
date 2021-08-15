@@ -42,9 +42,13 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 ### UpldateLog ###
 
 | UpldateLog | Content |
+| ---- | ---- |
+| Time | 2021/08/16 |
+| - | 1.`lutglshader` LUT-Filter Support Custom define size of lut-table image. |
+| Time | 2021/08/15 |
+| - | 1.`plusglshader` Effect-Filter Support Alpha channel, PR by <a href="https://github.com/numberwolf/FFmpeg-Plus-OpenGL/pull/25">Pull Request:#25</a> |
 | Time | 2021/07/06 |
 | - | 1.lutglshader is upward compatible with the newest ffmpeg.git's code |
-| ---- | ---- |
 | Time | 2021/06/26 |
 | - | 1.Support Lut look-up-table filter |
 
@@ -356,12 +360,16 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             Outputs:
                #0: default (video)
         lutglshader AVOptions:
-          sdsource          <string>     ..FV...... gl fragment shader source path (default is render lut fragment)
-          vxsource          <string>     ..FV...... gl vertex shader source path (default is render lut vertex)
-          start             <duration>   ..FV...... gl render start timestamp, if you set this option, must greater than zero(no trim) (default 0)
-          duration          <duration>   ..FV...... gl render duration, if you set this option, must greater than zero(no trim) (default 0)
-          ext               <string>     ..FV...... gl fragment shader externTex's source file (default is null)
-          ext_type          <int>        ..FV...... ext type(0:media 1:rgb24 default is 0) (from 0 to INT_MAX) (default 1)
+            sdsource          <string>     ..FV...... gl fragment shader source path (default is render lut fragment)
+            vxsource          <string>     ..FV...... gl vertex shader source path (default is render lut vertex)
+            start             <duration>   ..FV...... gl render start timestamp, if you set this option, must greater than zero(no trim) (default 0)
+            duration          <duration>   ..FV...... gl render duration, if you set this option, must greater than zero(no trim) (default 0)
+            lut_source        <string>     ..FV...... gl fragment shader externTex's source file (default is null). always for lut
+            lut_type          <int>        ..FV...... ext type(0:media 1:rgb24 default is 0) (from 0 to INT_MAX) (default 0)
+            lut_img_w         <int>        ..FV...... ext's width, when ext type is 1:rgb24, need be set. default is 512 (from 0 to INT_MAX) (default 512)
+            lut_img_h         <int>        ..FV...... ext's height, when ext type is 1:rgb24, need be set. default is 512 (from 0 to INT_MAX) (default 512)
+            lut_lineBlockCount <int>        ..FV...... lut color-block's count every line in lut-table(default is 8) (from 0 to INT_MAX) (default 8)
+            lut_oneBlockW     <int>        ..FV...... lut color-block's width every block(default is 64) (from 0 to INT_MAX) (default 64)
         
         This filter has support for timeline through the 'enable' option.
         ```
@@ -369,33 +377,47 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
       
 * Use `lutglshader` (Render & Transcoding)
 
-    > lutglshader=`ext=./lut.jpg:ext_type=0`:duration=5:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'
+    > IMG: lutglshader=`lut_source=./lut.jpg:lut_type=0`:duration=5'
+    >
+    > RGB: lutglshader=`lut_source=./lut.rgb:lut_type=1`:duration=5'
 
     * Params
     
-        * `ext` : lut image (default NULL)
-            > <img src="Plus-GL-Shader/lut.jpg" width='200' height='200' />
+        * `lut_source` : lut image (default NULL)
+            > <img src="assets/lut_usage.png" width='512' height='512' />
             >   
             > Example image 512x512 <a href="Plus-GL-Shader/lut.jpg">./lut.jpg</a>
-        * `ext_type` : lut file type, 0:`Image file` ,1:`RGB24 file` (Default is 0)
+        * `lut_type` : lut file type, 0:`Image file` ,1:`RGB24 file` (Default is 0)
         * `sdsource` : Fragment shader file path (Default is gray)
         * `vxsource` : Vertex shader file path (Default is gray)
+        * `lut_img_w` : LUT Image's width. eg: 512 (px)
+        * `lut_img_h` : LUT Image's height.
+        * `lut_lineBlockCount` : LUT Image: Count of blocks for one line. eg: (lut 512x512 's block count is 8. <a href="assets/lut_usage.png"> like here </a>)
+        * `lut_oneBlockW` : LUT Image: Block's width(px, lut 512x512 's block's width is 64px)
         * `start` : GL Render start timestamp
         * `duration` : GL Render duration
 
     * Filter Rules - Example
     
-        * `lutglshader=ext=./lut.jpg:ext_type=0`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl':duration=5`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl':start=1:duration=5`
+        * RGB File of LUT
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:start=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
+        
+        * Image File of LUT
+            * `lutglshader=lut_source=./lut.jpg`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0:lut_lineBlockCount=8:lut_oneBlockW=64`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0:lut_lineBlockCount=8:lut_oneBlockW=64:start=1:duration=5`
         
         * Use `lutglshader` Example
             ```bash
             ffmpeg -v debug \
-            -ss 40 -t 15 -i /Users/numberwolf/Documents/webroot/VideoMissile/VideoMissilePlayer/demo/res/cg.mp4 \
+            -ss 40 -t 15 -i cg.mp4 \
             -filter_complex \
-            "lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'" \
+            "lutglshader=lut_source=./lut.jpg" \
             -vcodec libx264 \
             -an \
             -f mp4 -y output.mp4

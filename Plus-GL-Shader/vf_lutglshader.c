@@ -6,11 +6,13 @@
  *          Discord: numberwolf#8694
  *          Github: https://github.com/numberwolf
  */
+#include <math.h>
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/avstring.h"
 
 #include "libavutil/opt.h"
 #include "internal.h"
@@ -47,50 +49,93 @@ static const GLchar *v_shader_source =
   "    TextureCoordsVarying.y = position.y * 0.5 + 0.5;\n"
   "}";
 
+// 8x8x8 -> 8^3 -> 512
+//static const GLchar *f_shader_source =
+//  "uniform sampler2D tex;\n"
+//  "uniform sampler2D externTex;\n"
+//  "varying vec2 TextureCoordsVarying;\n"
+//  "uniform float playTime;\n"
+//  "const float PI = 3.1415926;\n"
+//  "\n"
+//  "float rand(float n) {\n"
+//  "    return fract(sin(n) * 43758.5453123);\n"
+//  "}\n"
+//  "\n"
+//  "vec4 lookupTable(vec4 color, float progress){\n"
+//  "    //float blueColor = color.b * 63.0 * progress;\n"
+//  "    float blueColor = color.b * 63.0;\n"
+//  "\n"
+//  "    vec2 quad1;\n"
+//  "    quad1.y = floor(floor(blueColor) / 8.0);\n"
+//  "    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n"
+//  "\n"
+//  "    vec2 quad2;\n"
+//  "    quad2.y = floor(ceil(blueColor) / 8.0);\n"
+//  "    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n"
+//  "\n"
+//  "    vec2 texPos1;\n"
+//  "    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n"
+//  "    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n"
+//  "\n"
+//  "    vec2 texPos2;\n"
+//  "    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n"
+//  "    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n"
+//  "\n"
+//  "    vec4 newColor1 = texture2D(externTex, texPos1);\n"
+//  "    vec4 newColor2 = texture2D(externTex, texPos2);\n"
+//  "    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n"
+//  "    return vec4(newColor.rgb, color.w);\n"
+//  "}\n"
+//  "\n"
+//  "void main() {\n"
+//  "    float duration = 0.5;\n"
+//  "    float progress = mod(playTime, duration) / duration; // 0~1\n"
+//  "    vec4 imgColor = texture2D(tex, TextureCoordsVarying);\n"
+//  "    vec4 lutColor = lookupTable(imgColor, progress);\n"
+//  "    gl_FragColor = mix(imgColor, lutColor, 1.0);\n"
+//  "}";
+
 static const GLchar *f_shader_source =
-  "uniform sampler2D tex;\n"
-  "uniform sampler2D externTex;\n"
-  "varying vec2 TextureCoordsVarying;\n"
-  "uniform float playTime;\n"
-  "const float PI = 3.1415926;\n"
-  "\n"
-  "float rand(float n) {\n"
-  "    return fract(sin(n) * 43758.5453123);\n"
-  "}\n"
-  "\n"
-  "vec4 lookupTable(vec4 color, float progress){\n"
-  "    //float blueColor = color.b * 63.0 * progress;\n"
-  "    float blueColor = color.b * 63.0;\n"
-  "\n"
-  "    vec2 quad1;\n"
-  "    quad1.y = floor(floor(blueColor) / 8.0);\n"
-  "    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n"
-  "\n"
-  "    vec2 quad2;\n"
-  "    quad2.y = floor(ceil(blueColor) / 8.0);\n"
-  "    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n"
-  "\n"
-  "    vec2 texPos1;\n"
-  "    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n"
-  "    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n"
-  "\n"
-  "    vec2 texPos2;\n"
-  "    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);\n"
-  "    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);\n"
-  "\n"
-  "    vec4 newColor1 = texture2D(externTex, texPos1);\n"
-  "    vec4 newColor2 = texture2D(externTex, texPos2);\n"
-  "    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n"
-  "    return vec4(newColor.rgb, color.w);\n"
-  "}\n"
-  "\n"
-  "void main() {\n"
-  "    float duration = 0.5;\n"
-  "    float progress = mod(playTime, duration) / duration; // 0~1\n"
-  "    vec4 imgColor = texture2D(tex, TextureCoordsVarying);\n"
-  "    vec4 lutColor = lookupTable(imgColor, progress);\n"
-  "    gl_FragColor = mix(imgColor, lutColor, 1.0);\n"
-  "}";
+    "uniform sampler2D tex;\n"
+    "uniform sampler2D externTex;\n"
+    "varying vec2 TextureCoordsVarying;\n"
+    "uniform float playTime;\n"
+    "const float PI = 3.1415926;\n"
+    "\n"
+    "float rand(float n) {\n"
+    "    return fract(sin(n) * 43758.5453123);\n"
+    "}\n"
+    "\n"
+    "vec4 lookupTable(vec4 color){\n"
+    "    float blueColor = color.b * %f;\n" // 63
+    "\n"
+    "    vec2 quad1;\n"
+    "    quad1.y = floor(floor(blueColor) / %f);\n" // 8
+    "    quad1.x = floor(blueColor) - (quad1.y * %f);\n" // 8
+    "\n"
+    "    vec2 quad2;\n"
+    "    quad2.y = floor(ceil(blueColor) / %f);\n" // 8
+    "    quad2.x = ceil(blueColor) - (quad2.y * %f);\n" // 8
+    "\n"
+    "    vec2 texPos1;\n"
+    "    texPos1.x = (quad1.x * %f) + 0.5/%f + ((%f - 1.0/%f) * color.r);\n" // 0.125 512 0.125 512
+    "    texPos1.y = (quad1.y * %f) + 0.5/%f + ((%f - 1.0/%f) * color.g);\n" // 0.125 512 0.125 512
+    "\n"
+    "    vec2 texPos2;\n"
+    "    texPos2.x = (quad2.x * %f) + 0.5/%f + ((%f - 1.0/%f) * color.r);\n" // 0.125 512 0.125 512
+    "    texPos2.y = (quad2.y * %f) + 0.5/%f + ((%f - 1.0/%f) * color.g);\n" // 0.125 512 0.125 512
+    "\n"
+    "    vec4 newColor1 = texture2D(externTex, texPos1);\n"
+    "    vec4 newColor2 = texture2D(externTex, texPos2);\n"
+    "    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n"
+    "    return vec4(newColor.rgb, color.w);\n"
+    "}\n"
+    "\n"
+    "void main() {\n"
+    "    vec4 imgColor = texture2D(tex, TextureCoordsVarying);\n"
+    "    vec4 lutColor = lookupTable(imgColor);\n"
+    "    gl_FragColor = mix(imgColor, lutColor, 1.0);\n"
+    "}";
 
 #define PIXEL_FORMAT GL_RGB
 
@@ -119,8 +164,14 @@ typedef struct {
 
     int             debug_count;
 
+    // @param lutrgb
     // GL
     unsigned char   *lut_rgb;
+    int             lut_width;
+    int             lut_height;
+    int             lut_oneBlockWidth; // lut_blockW
+    int             lut_lineBlockCount; // lut_subBlockW
+
     // input shader vertex
     GLchar          *sdsource_data;
     GLchar          *vxsource_data;
@@ -143,8 +194,12 @@ static const AVOption lutglshader_options[] = {
     {"vxsource", "gl vertex shader source path (default is render lut vertex)", OFFSET(vxsource), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
     {"start", "gl render start timestamp, if you set this option, must greater than zero(no trim)", OFFSET(r_start_time), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
     {"duration", "gl render duration, if you set this option, must greater than zero(no trim)", OFFSET(duration), AV_OPT_TYPE_DURATION, {.i64 = 0.}, 0, INT64_MAX, FLAGS},
-    {"ext", "gl fragment shader externTex's source file (default is null)", OFFSET(ext_source), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
-    {"ext_type", "ext type(0:media 1:rgb24 default is 0)", OFFSET(ext_type), AV_OPT_TYPE_INT, {.i64=1}, 0, INT_MAX, FLAGS},
+    {"lut_source", "gl fragment shader externTex's source file (default is null). always for lut", OFFSET(ext_source), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, FLAGS},
+    {"lut_type", "ext type(0:media 1:rgb24 default is 0)", OFFSET(ext_type), AV_OPT_TYPE_INT, {.i64=0}, 0, INT_MAX, FLAGS},
+    {"lut_img_w", "ext's width, when ext type is 1:rgb24, need be set. default is 512", OFFSET(lut_width), AV_OPT_TYPE_INT, {.i64=512}, 0, INT_MAX, FLAGS},
+    {"lut_img_h", "ext's height, when ext type is 1:rgb24, need be set. default is 512", OFFSET(lut_height), AV_OPT_TYPE_INT, {.i64=512}, 0, INT_MAX, FLAGS},
+    {"lut_lineBlockCount", "lut color-block's count every line in lut-table(default is 8)", OFFSET(lut_lineBlockCount), AV_OPT_TYPE_INT, {.i64=8}, 0, INT_MAX, FLAGS},
+    {"lut_oneBlockW", "lut color-block's width every block(default is 64)", OFFSET(lut_oneBlockWidth), AV_OPT_TYPE_INT, {.i64=64}, 0, INT_MAX, FLAGS},
     {NULL}
 };
 
@@ -369,6 +424,11 @@ static int open_ext_source(AVFilterLink *inlink) {
                                 memcpy(gs->lut_rgb, outFrame->data[0], rgb24size);
                                 gs->lut_rgb[rgb24size] = 0;
 
+                                gs->lut_width = outFrame->width;
+                                gs->lut_height = outFrame->height;
+
+                                av_log(NULL, AV_LOG_DEBUG, "set lut wh : %dx%d\n", gs->lut_width, gs->lut_height);
+
                                 /*
                                  * free
                                  */
@@ -427,11 +487,9 @@ static int open_ext_source(AVFilterLink *inlink) {
     return ret;
 }
 
-static int tex_setup_lut(AVFilterLink *inlink) {
-
+static int lut_source_prepare(AVFilterLink *inlink) {
     AVFilterContext     *ctx    = inlink->dst;
     LutGLShaderContext  *gs     = ctx->priv;
-
     /*
      * media image
      */
@@ -467,11 +525,22 @@ static int tex_setup_lut(AVFilterLink *inlink) {
         fclose(f);
         gs->lut_rgb[fsize] = 0;
 
-
         //FILE *fw = fopen("./test.rgb", "wb");
         //fwrite(gs->lut_rgb, 1, fsize, fw);
         //fclose(fw);
     }
+
+
+    av_log(NULL, AV_LOG_DEBUG,
+            "debug set lut params value wh:%d lineBlockCount:%d blockW:%d\n",
+            gs->lut_width, gs->lut_lineBlockCount, gs->lut_oneBlockWidth);
+    return 0;
+}
+
+static int tex_setup_lut(AVFilterLink *inlink) {
+
+    AVFilterContext     *ctx    = inlink->dst;
+    LutGLShaderContext  *gs     = ctx->priv;
 
     glGenTextures(1, &gs->lut_tex);
     glActiveTexture(GL_TEXTURE0 + 1);
@@ -500,10 +569,8 @@ static int tex_setup_lut(AVFilterLink *inlink) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB,
-                 //GL_UNSIGNED_BYTE, gs->lut_rgb);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gs->lut_width, gs->lut_height, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, NULL);
 
     glUniform1i(glGetUniformLocation(gs->program, "externTex"), 1);
 
@@ -577,8 +644,20 @@ static int build_program(AVFilterContext *ctx) {
         // ...
     }
 
-    // dst shader source
-    const char *gl_sdsource_dst = gs->sdsource_data ? gs->sdsource_data : f_shader_source;
+    // set float value
+    float lineCount = gs->lut_lineBlockCount * 1.0;
+    float blockW    = gs->lut_oneBlockWidth - 1.0;
+    const char *gl_sdsource_dst = gs->sdsource_data ? gs->sdsource_data :
+            av_asprintf( // gs->lut_lineBlockCount, gs->lut_oneBlockWidth
+                    f_shader_source,
+                    blockW,
+                    lineCount, lineCount,
+                    lineCount, lineCount,
+                    1.0 / lineCount, gs->lut_width * 1.0, 1.0 / lineCount, gs->lut_width * 1.0,
+                    1.0 / lineCount, gs->lut_width * 1.0, 1.0 / lineCount, gs->lut_width * 1.0,
+                    1.0 / lineCount, gs->lut_width * 1.0, 1.0 / lineCount, gs->lut_width * 1.0,
+                    1.0 / lineCount, gs->lut_width * 1.0, 1.0 / lineCount, gs->lut_width * 1.0
+            );
     const char *gl_vxsource_dst = gs->vxsource_data ? gs->vxsource_data : v_shader_source;
 
     av_log(ctx, AV_LOG_DEBUG, 
@@ -696,6 +775,8 @@ static int config_props(AVFilterLink *inlink) {
     glewExperimental = GL_TRUE;
     glewInit();
     #endif
+
+    lut_source_prepare(inlink); // lut prepare
 
     glViewport(0, 0, inlink->w, inlink->h);
     gs->vTimebase = inlink->time_base;
@@ -845,7 +926,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
             glActiveTexture(GL_TEXTURE0 + 1);
             glBindTexture(GL_TEXTURE_2D, gs->lut_tex);
             // lut
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, gs->lut_rgb);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gs->lut_width, gs->lut_height, 0, PIXEL_FORMAT, GL_UNSIGNED_BYTE, gs->lut_rgb);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 

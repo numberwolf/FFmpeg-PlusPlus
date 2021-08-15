@@ -40,6 +40,10 @@
 
 | 更新日志 | 内容 |
 | ---- | ---- |
+| 时间 | 2021/08/16 |
+| - | 1.`lutglshader` LUT 贴纸滤镜支持 自定义LUT大小渲染能力 |
+| 时间 | 2021/08/15 |
+| - | 1.`plusglshader`支持透明通道渲染, PR by <a href="https://github.com/numberwolf/FFmpeg-Plus-OpenGL/pull/25">Pull Request:#25</a> |
 | 时间 | 2021/07/06 |
 | - | 1.filter兼容FFMpeg仓库最新版本 |
 | 时间 | 2021/06/26 |
@@ -348,12 +352,16 @@
             Outputs:
                #0: default (video)
         lutglshader AVOptions:
-          sdsource          <string>     ..FV...... gl fragment shader source path (default is render lut fragment)
-          vxsource          <string>     ..FV...... gl vertex shader source path (default is render lut vertex)
-          start             <duration>   ..FV...... gl render start timestamp, if you set this option, must greater than zero(no trim) (default 0)
-          duration          <duration>   ..FV...... gl render duration, if you set this option, must greater than zero(no trim) (default 0)
-          ext               <string>     ..FV...... gl fragment shader externTex's source file (default is null)
-          ext_type          <int>        ..FV...... ext type(0:media 1:rgb24 default is 0) (from 0 to INT_MAX) (default 1)
+            sdsource          <string>     ..FV...... gl fragment shader source path (default is render lut fragment)
+            vxsource          <string>     ..FV...... gl vertex shader source path (default is render lut vertex)
+            start             <duration>   ..FV...... gl render start timestamp, if you set this option, must greater than zero(no trim) (default 0)
+            duration          <duration>   ..FV...... gl render duration, if you set this option, must greater than zero(no trim) (default 0)
+            lut_source        <string>     ..FV...... gl fragment shader externTex's source file (default is null). always for lut
+            lut_type          <int>        ..FV...... ext type(0:media 1:rgb24 default is 0) (from 0 to INT_MAX) (default 0)
+            lut_img_w         <int>        ..FV...... ext's width, when ext type is 1:rgb24, need be set. default is 512 (from 0 to INT_MAX) (default 512)
+            lut_img_h         <int>        ..FV...... ext's height, when ext type is 1:rgb24, need be set. default is 512 (from 0 to INT_MAX) (default 512)
+            lut_lineBlockCount <int>        ..FV...... lut color-block's count every line in lut-table(default is 8) (from 0 to INT_MAX) (default 8)
+            lut_oneBlockW     <int>        ..FV...... lut color-block's width every block(default is 64) (from 0 to INT_MAX) (default 64)
         
         This filter has support for timeline through the 'enable' option.
         ```
@@ -361,32 +369,47 @@
       
 * 使用`lutglfilter`转码渲染 (Transcoding)
 
-    > lutglshader=`ext=./lut.jpg:ext_type=0`:duration=5:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'
+    > IMG: lutglshader=`lut_source=./lut.jpg:lut_type=0`:duration=5'
+    >
+    > RGB: lutglshader=`lut_source=./lut.rgb:lut_type=1`:duration=5'
 
     * 参数项
     
-        * `ext` : lut二维贴纸路径 (默认NULL)
-            > <img src="Plus-GL-Shader/lut.jpg" width='200' height='200' />
+        * `lut_source` : lut二维贴纸路径 (默认NULL)
+            > <img src="assets/lut_usage.png" width='512' height='512' />
             >   
             > 如图 512x512 <a href="Plus-GL-Shader/lut.jpg">./lut.jpg</a>
-        * `ext_type` : lut贴纸类型 0:图片 1:RGB24文件 (默认为图片)
+        * `lut_type` : lut贴纸类型 0:图片 1:RGB24文件 (默认为图片)
         * `sdsource` : 片元着色器文件路径 (默认为灰度效果)
         * `vxsource` : 定点着色器文件路径 (默认不做任何处理)
+        * `lut_img_w` : LUT贴纸宽度像素 eg: 512 (px)
+        * `lut_img_h` : LUT贴纸高度像素
+        * `lut_lineBlockCount` : LUT贴纸 每行的色块Block有多少个 eg: (512x512的一行block有8个 如上面图片所示)
+        * `lut_oneBlockW` : LUT贴纸 每个色块Block宽度多少像素
         * `start` : Shader渲染生效起始时间点
         * `duration` : Shader渲染生效时长,超出部分帧不做处理
         
     * 滤镜使用规则 - 示例
     
-        * `lutglshader=ext=./lut.jpg:ext_type=0`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl':duration=5`
-        * `lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl':start=1:duration=5`
+        * RGB文件 LUT表图
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
+            * `lutglshader=lut_source=./lut.rgb:lut_type=1:start=1:duration=5:lut_img_w=512:lut_img_h=512:lut_lineBlockCount=8:lut_oneBlockW=64:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'`
+        
+        * Image 图片(JPG/PNG) LUT表图
+            * `lutglshader=lut_source=./lut.jpg`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0:lut_lineBlockCount=8:lut_oneBlockW=64`
+            * `lutglshader=lut_source=./lut.jpg:lut_type=0:lut_lineBlockCount=8:lut_oneBlockW=64:start=1:duration=5`
+            
         * 使用`lutglshader`渲染示例
             ```bash
             ffmpeg -v debug \
-            -ss 40 -t 15 -i /Users/numberwolf/Documents/webroot/VideoMissile/VideoMissilePlayer/demo/res/cg.mp4 \
+            -ss 40 -t 15 -i cg.mp4 \
             -filter_complex \
-            "lutglshader=ext=./lut.jpg:ext_type=0:sdsource=gl/lut_shader.gl:vxsource='./lut_vertex.gl'" \
+            "lutglshader=lut_source=./lut.jpg" \
             -vcodec libx264 \
             -an \
             -f mp4 -y output.mp4

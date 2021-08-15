@@ -28,7 +28,7 @@
 - [相关帮助](#相关帮助)
     - [FFmpeg编译相关帮助 - 如果不知道FFmpeg是如何编译怎么办](#FFmpeg编译相关帮助)
 
-- [关于](#关于)
+- [关于作者 - 联系方式](#关于作者)
 
 ## 介绍 ##
 
@@ -474,7 +474,7 @@
     * <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">如果你不知道如何编译FFmpeg，请点这里</a>
     * [学会之后可以编译我们的 `plusglshader`</a>](#build)
 
-## 关于 ##
+## 关于作者 ##
 
 #### Contact
 
@@ -487,9 +487,11 @@
 
 * QQ: 531365872
 
+* QQ技术群: 925466059
+
 * Discord:numberwolf#8694
 
-* Wechat:numberwolf11
+* 微信:numberwolf11
 
 
 

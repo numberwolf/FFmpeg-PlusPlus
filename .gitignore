@@ -5,3 +5,5 @@ test.sh
 vf_plusglshader.c.bak
 newshader
 Plus-GL-Shader.bak*
+*.bak
+*.bak*

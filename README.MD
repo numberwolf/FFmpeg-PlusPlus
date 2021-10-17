@@ -1,4 +1,8 @@
-# FFmpeg + OpenGL(GLSL) - 视频编辑增强能力 
+# FFmpeg Plus OpenGL(GLSL) - 视频编辑增强能力 
+
+## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
+
+## <a href="README.MD"><b>渲染特效和LUT贴纸</b>请点这里</a> | <a href="README_FADE.MD"><b>转场特效</b>请点这里</a> | <a href="README_PIP.MD"><b>画中画特效</b>请点这里</a>
 
 <img src="./assets/logo_plusopengl.png" width="300px" />
 
@@ -8,9 +12,8 @@
 >
 > https://www.zzsin.com/shaderplus.html
 >
-> <img src="Plus-GL-Shader/web.jpg" width="500px" />
+> <img src="Plus-GL-Shader/resource/web.jpg" width="500px" />
 
-## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
 <hr>
 
 - [介绍](#介绍)
@@ -40,6 +43,9 @@
 
 | 更新日志 | 内容 |
 | ---- | ---- |
+| 时间 | 2021/10/17 |
+| - | 1.`fadeglshader` 支持转场特效 |
+| - | 2.`pipglshader` 支持画中画特效 |
 | 时间 | 2021/08/16 |
 | - | 1.`lutglshader` LUT 贴纸滤镜支持 自定义LUT大小渲染能力 |
 | 时间 | 2021/08/15 |
@@ -53,7 +59,7 @@
 
 ### 使用示例展示 ###
 
-* 示例脚本 <a href="Plus-GL-Shader/run_example.sh">`Plus-GL-Shader/run_example.sh`</a>
+* 示例脚本 <a href="Plus-GL-Shader/run.sh">`Plus-GL-Shader/run.sh`</a>
 
 * 示例Shaders: <a href="Plus-GL-Shader/gl">`示例Shader目录 ./Plus-GL-Shader/gl`</a>
 
@@ -61,6 +67,7 @@
 
 | filter | shader name | source | render |
 | - | - | - | - |
+| plusglshader [GLSL Shader渲染](#shader渲染) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/star_shader.gl">Plus-GL-Shader/gl/star_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/star_vertex.gl">Plus-GL-Shader/gl/star_vertex.gl</a> | <img src="Plus-GL-Shader/example_show/star-left.gif" width="300" /> | <img src="Plus-GL-Shader/example_show/star.gif" width="300" /> |
 | lutglshader [Lut look-up-table Shader渲染](#lut渲染) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/lut_shader.gl">Plus-GL-Shader/gl/lut_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/lut_vertex.gl">Plus-GL-Shader/gl/lut_vertex.gl</a> | <img src="Plus-GL-Shader/example_show/lut-right.png" width="150" /> | <img src="Plus-GL-Shader/example_show/lut-left.png" width="150" /> |
 | plusglshader [GLSL Shader渲染](#shader渲染) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/light_shader.gl">Plus-GL-Shader/gl/light_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/light_vertex.gl">Plus-GL-Shader/gl/light_vertex.gl</a> | <img src="Plus-GL-Shader/city720p.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/light.gif" width="300" /> |
 | plusglshader [GLSL Shader渲染](#shader渲染) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/mirror_shader.gl">Plus-GL-Shader/gl/mirror_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/mirror_vertex.gl">Plus-GL-Shader/gl/mirror_vertex.gl</a> | <img src="Plus-GL-Shader/cg.gif" width="300" /> | <img src="Plus-GL-Shader/example_show/mirror.gif" width="300" /> |
@@ -158,8 +165,10 @@
         * 编译的`必选项` - 和此滤镜相关
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
-            > --enable-filter=plusglshader \   
-            > --enable-filter=lutglshader
+            > --enable-filter=plusglshader \
+            > --enable-filter=lutglshader \
+            > --enable-filter=fadeglshader \
+            > --enable-filter=pipglshader
 
         * 编译示例 - 可以不参考此示例，但是必须加上`必选项`
             ```shell
@@ -181,7 +190,9 @@
               --enable-opengl \
               --extra-libs='-lGLEW -lglfw' \
               --enable-filter=plusglshader \
-              --enable-filter=lutglshader
+              --enable-filter=lutglshader \
+              --enable-filter=fadeglshader \
+              --enable-filter=pipglshader
             make clean
             make -j16
             make install
@@ -201,7 +212,7 @@
         ```shell
         ffmpeg version a0d68e65 Copyright (c) 2000-2020 the FFmpeg developers
           built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
-          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
+          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader --enable-filter=lutglshader --enable-filter=fadeglshader --enable-filter=pipglshader
           libavutil      56. 51.100 / 56. 51.100
           libavcodec     58. 91.100 / 58. 91.100
           libavformat    58. 45.100 / 58. 45.100
@@ -321,7 +332,7 @@
 
         | Tag | Src | Dst |
         |-|-|-|
-        | Frame | <img src="Plus-GL-Shader/example_src.png" width="500" /> | <img src="Plus-GL-Shader/example_dst.png" width="500" /> |
+        | Frame | <img src="Plus-GL-Shader/resource/example_src.png" width="500" /> | <img src="Plus-GL-Shader/resource/example_dst.png" width="500" /> |
         
         
 #### lut渲染 ####
@@ -336,7 +347,7 @@
         ```shell
         ffmpeg version d48da9a Copyright (c) 2000-2020 the FFmpeg developers
           built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
-          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
+          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader --enable-filter=lutglshader --enable-filter=fadeglshader --enable-filter=pipglshader
           libavutil      56. 51.100 / 56. 51.100
           libavcodec     58. 91.100 / 58. 91.100
           libavformat    58. 45.100 / 58. 45.100
@@ -378,7 +389,7 @@
         * `lut_source` : lut二维贴纸路径 (默认NULL)
             > <img src="assets/lut_usage.png" width='512' height='512' />
             >   
-            > 如图 512x512 <a href="Plus-GL-Shader/lut.jpg">./lut.jpg</a>
+            > 如图 512x512 <a href="Plus-GL-Shader/resource/lut.jpg">./resource/lut.jpg</a>
         * `lut_type` : lut贴纸类型 0:图片 1:RGB24文件 (默认为图片)
         * `sdsource` : 片元着色器文件路径 (默认为灰度效果)
         * `vxsource` : 定点着色器文件路径 (默认不做任何处理)

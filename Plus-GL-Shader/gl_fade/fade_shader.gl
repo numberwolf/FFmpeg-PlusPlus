@@ -1,0 +1,10 @@
+uniform sampler2D tex;
+uniform float playTime;
+varying vec2 texCoord;
+
+uniform float isSecond;
+uniform float progress;
+
+void main() {
+    gl_FragColor = vec4(texture2D(tex, texCoord).rgb, progress);
+}

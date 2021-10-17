@@ -20,28 +20,55 @@
 
 #define TS2T(ts, tb) ((ts) == AV_NOPTS_VALUE ? NAN : (double)(ts)*av_q2d(tb))
 
+#ifndef OPENGL_RENDER_GRAPH_GL_SHADER_FORAMT
+#define OPENGL_RENDER_GRAPH_GL_SHADER_FORAMT
+#define	NUMBERWOLF_STRINGIZE(x)	#x
+#define	NUMBERWOLF_GL_SHADER(shader) "" NUMBERWOLF_STRINGIZE(shader)
+#endif //OPENGL_RENDER_GRAPH_GL_SHADER_FORAMT
+
 static const float position[12] = {
   -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 1.0f};
 
-static const GLchar *v_shader_source =
-  "attribute vec2 position;\n"
-  "varying vec2 texCoord;\n"
-  "void main(void) {\n"
-  "  gl_Position = vec4(position, 0, 1);\n"
-  "  texCoord = position;\n"
-  "}\n";
+static const GLchar *v_shader_source = (const GLchar *) NUMBERWOLF_GL_SHADER (
+    attribute vec2 position;
+    uniform float playTime;
+    varying vec2 texCoord;
+    float PI = 3.1415926;
+    void main(void) {
+        float duration = 1.0;
+        float progress = mod(playTime, duration) / duration; // 0~1
+        float moveX = 0.0;
+        float moveY = 0.0;
+        float rotate = 360.0 * progress * 0.0;
+        float radians = rotate * PI / 180.0;
+        float s = sin(radians);
+        float c = cos(radians);
+        mat4 zRotation = mat4(
+                c,      -s,     0.0,    0.0, // 1:scale-x 4:y axis - turn anticlockwise
+                s,      c,      0.0,    0.0, // 2:scale-y 4:x axis - turn clockwise , alse for uniform scale
+                0.0,    0.0,    1.0,    0.0,
+                0.0,    0.0,    0.0,    1.0 // 1:mv right 2:mv up
+        );
+        gl_Position = zRotation * vec4(position, 0, 1);
+        texCoord = position;
+    }
+);
 
-static const GLchar *f_shader_source =
-  "uniform sampler2D tex;\n"
-  "uniform float playTime;\n"
-  "varying vec2 texCoord;\n"
-  "void main() {\n"
-  "  gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);\n"
-  "  float gray = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;\n"
-  "  gl_FragColor.r = gray;\n"
-  "  gl_FragColor.g = gray;\n"
-  "  gl_FragColor.b = gray;\n"
-  "}\n";
+static const GLchar *f_shader_source = (const GLchar *) NUMBERWOLF_GL_SHADER (
+    uniform sampler2D tex;
+    uniform float playTime;
+    varying vec2 texCoord;
+    void main() {
+        gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);
+        //gl_FragColor = texture2D(tex, texCoord);
+        //gl_FragColor.a = 0.5;
+        //float gray = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
+        //gl_FragColor.r = gray;
+        //gl_FragColor.g = gray;
+        //gl_FragColor.b = gray;
+    }
+);
+
 
 typedef struct {
     const AVClass *class;
@@ -67,7 +94,6 @@ typedef struct {
     double          duration_ft;
 
     // GL
-    unsigned char   *lut_rgb;
     // input shader vertex
     GLchar          *sdsource_data;
     GLchar          *vxsource_data;
@@ -75,7 +101,6 @@ typedef struct {
     // GL Obj
     GLuint          program;
     GLuint          frame_tex;
-    GLuint          lut_tex;
     GLFWwindow      *window;
     GLuint          pos_buf;
 } PlusGLShaderContext;
@@ -152,61 +177,6 @@ static void tex_setup(AVFilterLink *inlink) {
     glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, inlink->w, inlink->h, 0, gs->pix_fmt, GL_UNSIGNED_BYTE, NULL);
 
     glUniform1i(glGetUniformLocation(gs->program, "tex"), 0);
-}
-
-static int tex_setup_lut(AVFilterLink *inlink, const char* lut_path) {
-    AVFilterContext     *ctx = inlink->dst;
-    PlusGLShaderContext *gs = ctx->priv;
-
-
-    FILE *f = fopen(lut_path, "rb");
-    if (!f) {
-        av_log(ctx, AV_LOG_ERROR,
-               "doing vf_plusglshader tex_setup_lut: invalid lut path \"%s\"\n", lut_path);
-        return -1;
-    }
-
-    // get file size
-    fseek(f, 0, SEEK_END);
-    unsigned long fsize = ftell(f);
-    fseek(f, 0, SEEK_SET);
-
-    gs->lut_rgb = malloc(fsize + 1);
-    fread(gs->lut_rgb, fsize, 1, f);
-    fclose(f);
-    gs->lut_rgb[fsize] = 0;
-
-
-    FILE *fw = fopen("./test.rgb", "wb");
-    fwrite(gs->lut_rgb, 1, fsize, fw);
-    fclose(fw);
-
-    glGenTextures(1, &gs->lut_tex);
-    glActiveTexture(GL_TEXTURE1);
-
-    //glBindTexture(GL_TEXTURE_3D,  gs->lut_tex);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, 32, 32, 32, 0, GL_RGB,
-    //             GL_UNSIGNED_BYTE, gs->lut_rgb);
-
-    glBindTexture(GL_TEXTURE_2D,  gs->lut_tex);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, 512, 512, 0, gs->pix_fmt,
-                 GL_UNSIGNED_BYTE, gs->lut_rgb);
-
-    glUniform1i(glGetUniformLocation(gs->program, "tex2"), 1);
-
-    return 0;
 }
 
 /**
@@ -415,9 +385,14 @@ static int config_props(AVFilterLink *inlink) {
     }
 
     glUseProgram(gs->program);
+
+    //glEnable(GL_ALPHA);
+    //glEnable(GL_BLEND);
+    // //glEnable(GL_DEPTH_TEST);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     vbo_setup(gs);
     tex_setup(inlink);
-    //tex_setup_lut(inlink, "./lut.rgb");
     uni_setup(inlink);
     return 0;
 }
@@ -427,6 +402,12 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
     // AVFilterLink *inlink    = ctx->inputs[0];
     AVFilterLink *outlink   = ctx->outputs[0];
     PlusGLShaderContext *gs = ctx->priv;
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // @TODO trans to RGB/RGBA
+    // ...
 
     double playTime = TS2T(in->pts, gs->vTimebase);
     // check start time
@@ -458,7 +439,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in) {
         av_log(ctx, AV_LOG_DEBUG,
                "doing vf_plusglshader filter_frame gl render pts:%ld ,time->%f, duration:%f\n", in->pts, playTime, gs->duration_ft);
 
-        glUniform1f(gs->playTime, playTime);
+        glUniform1f(gs->playTime, playTime - gs->r_start_time_ft);
 
         glTexImage2D(GL_TEXTURE_2D, 0, gs->pix_fmt, inlink->w, inlink->h, 0, gs->pix_fmt, GL_UNSIGNED_BYTE, in->data[0]);
         glDrawArrays(GL_TRIANGLES, 0, 6);

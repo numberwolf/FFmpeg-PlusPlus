@@ -1,4 +1,16 @@
-# FFmpeg + OpenGL(GLSL) - For video edit rendering
+# FFmpeg Plus OpenGL(GLSL) - For video edit rendering
+
+## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
+
+* Support
+
+    * #### <a href="README_EN.MD"><b>Render Effects and LUT</b> - Click here</a>
+    
+    * #### <a href="README_FADE_EN.MD"><b>Transition Fade Effects</b> - Click here</a> 
+    
+    * #### <a href="README_PIP_EN.MD"><b>Picture in Picture Effects</b>- Click here</a>
+
+<hr>
 
 <img src="./assets/logo_plusopengl.png" width="300px" />
 
@@ -10,10 +22,8 @@
 >
 > https://www.zzsin.com/shaderplus.html
 >
-> <img src="Plus-GL-Shader/web.jpg" width="500px" />
+> <img src="Plus-GL-Shader/resource/web.jpg" width="500px" />
 
-
-## <a href="README_EN.MD">English</a> | <a href="README.MD"><b>中文</b></a>
 <hr>
 
 - [Introduce](#introduce)
@@ -43,6 +53,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 | UpldateLog | Content |
 | ---- | ---- |
+| Time | 2021/10/17 |
+| - | 1.`fadeglshader` Support Transition Fade effects |
+| - | 2.`pipglshader` Support Picture in Picture effects |
 | Time | 2021/08/16 |
 | - | 1.`lutglshader` LUT-Filter Support Custom define size of lut-table image. |
 | Time | 2021/08/15 |
@@ -55,7 +68,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 ### Example ###
 
-* Script <a href="Plus-GL-Shader/run_example.sh">`Plus-GL-Shader/run_example.sh`</a>
+* Script <a href="Plus-GL-Shader/run.sh">`Plus-GL-Shader/run.sh`</a>
 
 * Shaders: <a href="Plus-GL-Shader/gl">`See Example Shaders ./Plus-GL-Shader/gl`</a>
 
@@ -63,6 +76,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 | filter | shader name | source | render |
 | - | - | - | - |
+| plusglshader [GLSL Shader](#shader-render) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/star_shader.gl">Plus-GL-Shader/gl/star_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/star_vertex.gl">Plus-GL-Shader/gl/star_vertex.gl</a> | <img src="Plus-GL-Shader/example_show/star-left.gif" width="300" /> | <img src="Plus-GL-Shader/example_show/star.gif" width="300" /> |
 | lutglshader [Lut look-up-table Shader](#lut-render) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/lut_shader.gl">Plus-GL-Shader/gl/lut_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/lut_vertex.gl">Plus-GL-Shader/gl/lut_vertex.gl</a> | <img src="Plus-GL-Shader/example_show/lut-right.png" width="150" /> | <img src="Plus-GL-Shader/example_show/lut-left.png" width="150" /> |
 | plusglshader [GLSL Shader](#shader-render)| Fragments Shader: <br><a href="Plus-GL-Shader/gl/light_shader.gl">Plus-GL-Shader/gl/light_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/light_vertex.gl">Plus-GL-Shader/gl/light_vertex.gl</a> | <img src="Plus-GL-Shader/city720p.jpeg" width="300" /> | <img src="Plus-GL-Shader/example_show/light.gif" width="300" /> |
 | plusglshader [GLSL Shader](#shader-render) | Fragments Shader: <br><a href="Plus-GL-Shader/gl/mirror_shader.gl">Plus-GL-Shader/gl/mirror_shader.gl</a><br>Vertex Shader: <br><a href="Plus-GL-Shader/gl/mirror_vertex.gl">Plus-GL-Shader/gl/mirror_vertex.gl</a> | <img src="Plus-GL-Shader/cg.gif" width="300" /> | <img src="Plus-GL-Shader/example_show/mirror.gif" width="300" /> |
@@ -166,7 +180,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             > --enable-opengl \
             > --extra-libs='-lGLEW -lglfw' \
             > --enable-filter=plusglshader \
-            > --enable-filter=lutglshader
+            > --enable-filter=lutglshader \
+            > --enable-filter=fadeglshader \
+            > --enable-filter=pipglshader
 
         * Example
             ```shell
@@ -188,7 +204,9 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
               --enable-opengl \
               --extra-libs='-lGLEW -lglfw' \
               --enable-filter=plusglshader \
-              --enable-filter=lutglshader
+              --enable-filter=lutglshader \
+              --enable-filter=fadeglshader \
+              --enable-filter=pipglshader
             make clean
             make -j16
             make install
@@ -207,7 +225,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         ```shell
         ffmpeg version a0d68e65 Copyright (c) 2000-2020 the FFmpeg developers
           built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
-          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
+          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader --enable-filter=lutglshader --enable-filter=fadeglshader --enable-filter=pipglshader
           libavutil      56. 51.100 / 56. 51.100
           libavcodec     58. 91.100 / 58. 91.100
           libavformat    58. 45.100 / 58. 45.100
@@ -236,7 +254,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
 * Use `plusglshader` (Render & Transcoding)
 
-    > plusglshader=sdsource='./test_shader.gl':vxsource='./test_vertex.gl'
+    > plusglshader=sdsource='./resource/test_shader.gl':vxsource='./resource/test_vertex.gl'
 
     * Params
     
@@ -267,7 +285,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
     * Write your own shader!
 
         * 1) Fragment shader
-            > Example: <a href="Plus-GL-Shader/test_shader.gl">test_shader.gl</a>
+            > Example: <a href="Plus-GL-Shader/resource/test_shader.gl">test_shader.gl</a>
 
             #### Notice: playTime is timestamp, from 0 -> end
 
@@ -286,7 +304,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
             ```
 
         * 2) Vertex shader
-            > Example: <a href="Plus-GL-Shader/test_vertex.gl">test_vertex.gl</a>
+            > Example: <a href="Plus-GL-Shader/resource/test_vertex.gl">test_vertex.gl</a>
 
             ```c
             attribute vec2 position;
@@ -328,7 +346,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
 
         | Tag | Src | Dst |
         |-|-|-|
-        | Frame | <img src="Plus-GL-Shader/example_src.png" width="500" /> | <img src="Plus-GL-Shader/example_dst.png" width="500" /> |
+        | Frame | <img src="Plus-GL-Shader/resource/example_src.png" width="500" /> | <img src="Plus-GL-Shader/resource/example_dst.png" width="500" /> |
 
 
 
@@ -344,7 +362,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         ```shell
         ffmpeg version d48da9a Copyright (c) 2000-2020 the FFmpeg developers
           built with Apple LLVM version 10.0.0 (clang-1000.10.44.4)
-          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader
+          configuration: --enable-cross-compile --pkg-config-flags=--static --extra-ldflags='-lm -lz -llzma -lpthread' --extra-libs=-lpthread --extra-libs=-lm --enable-gpl --enable-libfdk_aac --enable-libfreetype --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --enable-libass --enable-libfreetype --enable-libfontconfig --enable-libfribidi --enable-libwebp --enable-nonfree --disable-shared --enable-static --enable-opengl --extra-libs='-lGLEW -lglfw' --enable-filter=plusglshader --enable-filter=lutglshader --enable-filter=fadeglshader --enable-filter=pipglshader
           libavutil      56. 51.100 / 56. 51.100
           libavcodec     58. 91.100 / 58. 91.100
           libavformat    58. 45.100 / 58. 45.100
@@ -386,7 +404,7 @@ You can use <a href="Plus-GL-Shader">filter `plusglshader`</a> to render frame b
         * `lut_source` : lut image (default NULL)
             > <img src="assets/lut_usage.png" width='512' height='512' />
             >   
-            > Example image 512x512 <a href="Plus-GL-Shader/lut.jpg">./lut.jpg</a>
+            > Example image 512x512 <a href="Plus-GL-Shader/resource/lut.jpg">./resource/lut.jpg</a>
         * `lut_type` : lut file type, 0:`Image file` ,1:`RGB24 file` (Default is 0)
         * `sdsource` : Fragment shader file path (Default is gray)
         * `vxsource` : Vertex shader file path (Default is gray)

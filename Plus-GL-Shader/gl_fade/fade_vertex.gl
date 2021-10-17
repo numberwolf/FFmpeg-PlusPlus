@@ -1,0 +1,23 @@
+attribute vec2 position;
+varying vec2 texCoord;
+
+float PI = 3.1415926;
+uniform float playTime;
+uniform float scale_w;
+uniform float scale_h;
+uniform float isSecond;
+uniform float fadeDuration;
+uniform float offset;
+uniform float mainWidth;
+uniform float mainHeight;
+uniform float secondWidth;
+uniform float secondHeight;
+void main(void) {
+    // genType step (genType edge, genType x)，genType step (float edge, genType x)
+    // if x < edge，0.0 else 1.0
+    // if x >= edge, 1.0 else 0.0
+    texCoord.x = position.x * 0.5 + 0.5;
+    texCoord.y = position.y * 0.5 + 0.5;
+    gl_Position = vec4(position, 0, 1);
+    //gl_Position = vec4(position * vec2(scale_w, scale_h), 0, 1);
+}

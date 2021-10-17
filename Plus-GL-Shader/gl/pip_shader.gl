@@ -1,0 +1,20 @@
+uniform sampler2D tex;
+uniform float playTime;
+varying vec2 texCoord;
+
+uniform float scale;
+uniform float isPIP;
+
+void main() {
+    //gl_FragColor = texture2D(tex, (texCoord * (0.5 / scale) + (0.5 / scale)));
+    if (isPIP < 1.0) {
+        gl_FragColor = vec4(texture2D(tex, texCoord).rgb, 1.0);
+    } else {
+        gl_FragColor = vec4(texture2D(tex, texCoord).rgb, 0.1);
+    }
+
+    //float gray = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
+    //gl_FragColor.r = gray;
+    //gl_FragColor.g = gray;
+    //gl_FragColor.b = gray;
+}

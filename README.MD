@@ -158,6 +158,8 @@
         #
         cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_plusglshader.c libavfilter/
         cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_lutglshader.c libavfilter/
+        cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_pipglshader.c libavfilter/
+        cp ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/vf_fadeglshader.c libavfilter/
         git apply ../FFmpeg-Plus-OpenGL/Plus-GL-Shader/libavfilter.diff
         ```
 

@@ -223,8 +223,8 @@ static GLuint build_shader(AVFilterContext *ctx, const GLchar *shader_source, GL
         //std::vector<char> ShaderErrorMessage(InfoLogLength + 1);
         char *ShaderErrorMessage = (char *)malloc(InfoLogLength);
 
-        glGetShaderInfoLog(shader, InfoLogLength, NULL, &ShaderErrorMessage);
-        av_log(ctx, AV_LOG_ERROR, "doing vf_lutglshader build_shader ERROR: %s\n", &ShaderErrorMessage);
+        glGetShaderInfoLog(shader, InfoLogLength, NULL, ShaderErrorMessage);
+        av_log(ctx, AV_LOG_ERROR, "doing vf_lutglshader build_shader ERROR: %s\n", ShaderErrorMessage);
     }
 
     GLuint ret = status == GL_TRUE ? shader : 0;

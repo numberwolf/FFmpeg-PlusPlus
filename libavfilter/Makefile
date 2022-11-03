@@ -433,6 +433,11 @@ OBJS-$(CONFIG_YADIF_CUDA_FILTER)             += vf_yadif_cuda.o vf_yadif_cuda.pt
 OBJS-$(CONFIG_ZMQ_FILTER)                    += f_zmq.o
 OBJS-$(CONFIG_ZOOMPAN_FILTER)                += vf_zoompan.o
 OBJS-$(CONFIG_ZSCALE_FILTER)                 += vf_zscale.o
+OBJS-$(CONFIG_PLUSGLSHADER_FILTER)           += vf_plusglshader.o
+OBJS-$(CONFIG_LUTGLSHADER_FILTER)            += vf_lutglshader.o
+OBJS-$(CONFIG_FADEGLSHADER_FILTER)           += vf_fadeglshader.o
+OBJS-$(CONFIG_PIPGLSHADER_FILTER)            += vf_pipglshader.o
+
 
 OBJS-$(CONFIG_ALLRGB_FILTER)                 += vsrc_testsrc.o
 OBJS-$(CONFIG_ALLYUV_FILTER)                 += vsrc_testsrc.o

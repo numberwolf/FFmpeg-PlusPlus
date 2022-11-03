@@ -1,0 +1,9 @@
+.DS_Store
+*.mp4
+.idea
+test.sh
+vf_plusglshader.c.bak
+newshader
+Plus-GL-Shader.bak*
+*.bak
+*.bak*

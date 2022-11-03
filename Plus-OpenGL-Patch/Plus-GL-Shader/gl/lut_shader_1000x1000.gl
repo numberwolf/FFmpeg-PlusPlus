@@ -1,0 +1,40 @@
+uniform sampler2D tex;
+uniform sampler2D externTex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+const float PI = 3.1415926;
+
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+vec4 lookupTable(vec4 color){
+    float blueColor = color.b * 63.000000;
+
+    vec2 quad1;
+    quad1.y = floor(floor(blueColor) / 8.000000);
+    quad1.x = floor(blueColor) - (quad1.y * 8.000000);
+
+    vec2 quad2;
+    quad2.y = floor(ceil(blueColor) / 8.000000);
+    quad2.x = ceil(blueColor) - (quad2.y * 8.000000);
+
+    vec2 texPos1;
+    texPos1.x = (quad1.x * 0.125) + 0.5/1000.000000 + ((0.125000 - 1.0/1000.000000) * color.r);
+    texPos1.y = (quad1.y * 0.125) + 0.5/1000.000000 + ((0.125000 - 1.0/1000.000000) * color.g);
+
+    vec2 texPos2;
+    texPos2.x = (quad2.x * 0.125) + 0.5/1000.000000 + ((0.125000 - 1.0/1000.000000) * color.r);
+    texPos2.y = (quad2.y * 0.125) + 0.5/1000.000000 + ((0.125000 - 1.0/1000.000000) * color.g);
+
+    vec4 newColor1 = texture2D(externTex, texPos1);
+    vec4 newColor2 = texture2D(externTex, texPos2);
+    vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
+    return vec4(newColor.rgb, color.w);
+}
+
+void main() {
+    vec4 imgColor = texture2D(tex, TextureCoordsVarying);
+    vec4 lutColor = lookupTable(imgColor);
+    gl_FragColor = mix(imgColor, lutColor, 1.0);
+}

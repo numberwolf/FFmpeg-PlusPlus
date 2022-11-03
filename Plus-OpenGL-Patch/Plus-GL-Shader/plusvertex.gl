@@ -1,0 +1,27 @@
+attribute vec2 position;
+uniform float playTime;
+varying vec2 texCoord;
+float PI = 3.1415926;
+void main(void) {
+    float duration = 1.0;
+    float p_playTime = 0.5;
+    float progress = mod(playTime, duration) / duration; // 0~1
+    float moveX = 0.0;
+    //float moveY = 1.5 - 1.5 * progress;
+    float moveY = 0.0;
+    float rotate = 360.0 * progress * 0.0;
+    //float rotate = 90.0;
+    float radians = rotate * PI / 180.0;
+    float s = sin(radians);
+    float c = cos(radians);
+    mat4 zRotation = mat4(
+            c,      -s,     0.0,    0.0, // 1:scale-x 4:y轴翻转 逆时针
+            s,      c,      0.0,    0.0, // 2:scale-y 4:x轴翻转 顺时针 也可以用scale的uniform
+            //1.0,      -s,     0.0,    0.0, // 1:scale-x 4:y轴翻转 逆时针
+            //s,      0.5,      0.0,    0.0, // 2:scale-y 4:x轴翻转 顺时针 也可以用scale的uniform
+            0.0,    0.0,    1.0,    0.0,
+            0.0 + moveX,    0.0 + moveY,    0.0,    1.0 // 1:mv right 2:mv up
+    );
+    gl_Position = zRotation * vec4(position, 0, 1);
+    texCoord = position;
+}

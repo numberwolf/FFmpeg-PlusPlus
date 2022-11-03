@@ -1,0 +1,102 @@
+// https://www.zzsin.com
+// https://github.com/numberwolf/FFmpeg-Plus-OpenGL
+//precision highp float;
+precision mediump float; // remove it in FFmpeg-Plus-OpenGL
+uniform sampler2D tex;
+varying vec2 TextureCoordsVarying;
+uniform float playTime;
+
+// ===== START write: your own fragment transform =====
+const float PI = 3.1415926;
+
+const vec2 u_resolution = vec2(0.5, 0.5);
+
+float draw_rectangle(vec2 coord, vec2 dimensions) {
+    vec2 shaper = vec2(step(coord.x, dimensions.x), step(coord.y, dimensions.y));
+    return shaper.x * shaper.y;
+}
+
+float draw_rectangle2(vec2 coord, vec2 dimensions, vec2 offset) {
+    vec2 shaper = step(offset, coord);
+    shaper *= step(coord, offset + dimensions);
+
+    return shaper.x * shaper.y;
+}
+
+vec4 draw_rectangle3(vec2 coord, vec4 imgColor,
+                     vec2 offset, vec2 dimensions) {
+
+      // genType step (genType edge, genType x)，genType step (float edge, genType x)
+    // 如果edge > x ，返回1.0，否则返回0.0
+      // offset > coord = 1.0
+    vec2 shaper = step(offset, coord);
+      shaper *= step(coord, offset + dimensions);
+      //vec2 shaper = step(coord.xy, offset);
+      //
+      // |<- part ->|- rect -|
+      //
+      vec4 color = mix(
+      imgColor,
+      vec4(1.0, .0, .0, 1.0),
+      1.0 * shaper.x * shaper.y);
+      //coord.r = color.r * shaper;
+      //float r = color.r * shaper;
+
+    return color;
+}
+
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+
+/*****************************************************************
+ *
+ *
+ *                           Param
+ *
+ *
+ *****************************************************************/
+const float p_mid_bandwidth = 0.1;
+const float p_mid_height    = 0.2;
+
+const float p_line1_len     = 0.3;
+const float p_line1_weight  = 0.01;
+const vec2  p_line1_pos1    = vec2(0.1, 0.5);
+
+const float p_line2_len     = 0.3;
+const float p_line2_weight  = 0.01;
+const vec2  p_line2_pos1    = vec2(
+        p_line1_pos1.x + p_mid_bandwidth,
+        p_line1_pos1.y + p_mid_height);
+
+void main() {
+    float duration = 2.0;
+    float progress = mod(playTime, duration) / duration; // 0~1
+    vec4 imgColor = texture2D(tex, TextureCoordsVarying);
+
+    //vec2 coord = gl_FragCoord.xy / u_resolution;
+    //vec2 coord = vec2(0.5, 0.5);
+    vec2 pos1 = vec2(0.5 - (0.25 * progress), 0.25);
+    vec2 size = vec2(0.5 * progress, 0.5);
+    gl_FragColor = draw_rectangle3(
+        TextureCoordsVarying,
+          imgColor,
+          pos1,
+          size
+    );
+
+    //vec4 color = vec4(rectangle);
+    //vec4 imgColor = texture2D(tex, TextureCoordsVarying);
+
+    // genType step (genType edge, genType x)，genType step (float edge, genType x)
+    // 如果x < edge，返回0.0，否则返回1.0
+    //gl_FragColor = rectangle;
+
+    //if (TextureCoordsVarying.x > 0.5) {
+    //    gl_FragColor = mix(imgColor, color, 1.0);
+    //} else {
+    //    gl_FragColor = imgColor;
+    //}
+    //gl_FragColor = color;
+}

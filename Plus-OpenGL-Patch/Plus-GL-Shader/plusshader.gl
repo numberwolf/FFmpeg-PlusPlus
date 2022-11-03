@@ -1,0 +1,38 @@
+uniform sampler2D tex;
+uniform float playTime;
+varying vec2 texCoord;
+void main() {
+    //gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);
+    //gl_FragColor = texture2D(tex, texCoord);
+    //gl_FragColor.a = 0.5;
+    //float gray = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
+    //gl_FragColor.r = gray;
+    //gl_FragColor.g = gray;
+    //gl_FragColor.b = gray;
+
+    float duration = 1.0;
+    float progress = mod(playTime, duration) / duration; // 0~1
+
+    gl_FragColor = texture2D(tex, texCoord * 0.5 + 0.5);
+    //gl_FragColor = texture2D(tex, texCoord);
+
+    float scale = 1.0;
+    float isPIP = 1.0;
+    float bottom = isPIP * ((1.0 - scale) / 2.0 + scale) / scale; // progress
+    float top = isPIP * (1.0 - bottom);
+
+    bottom *= progress;
+    // genType step (genType edge, genType x)，genType step (float edge, genType x)
+    // if x < edge 0.0 else 1.0
+    float topCheck = step(top, texCoord.y);
+    float bottomCheck = step(texCoord.y, bottom);
+
+    gl_FragColor.a *= (topCheck * bottomCheck) + (1. - isPIP);
+    gl_FragColor.a = min(1.0, gl_FragColor.a);
+
+    //float checkAlpha = 1.0 - step(gl_FragColor.a, 0.0);
+    //gl_FragColor.a *= checkAlpha;
+    //gl_FragColor.r *= checkAlpha;
+    //gl_FragColor.g *= checkAlpha;
+    //gl_FragColor.b *= checkAlpha;
+}

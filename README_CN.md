@@ -7,7 +7,7 @@
 
 ## 联系
 
-* QQ Group Number: contact 
+* QQ Group Number: 925466059 
 * Email: porschegt23@foxmail.com
 * WeChat: numberwolf11 (尽量加QQ群，除了靠谱技术合作 不接受单聊)
 

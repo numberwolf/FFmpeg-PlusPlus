@@ -5,7 +5,13 @@
 * FFmpeg Filter支持特效/转场/画中画、特效/LUT贴纸能力, 支持OpenGL Shader
 * FFmpeg 支持转码HEVC/AV1/Opus编码 的FLV流
 
-## 0. Feature
+## 联系
+
+* QQ Group Number: contact 
+* Email: porschegt23@foxmail.com
+* WeChat: numberwolf11 (尽量加QQ群，除了靠谱技术合作 不接受单聊)
+
+## 0. 功能
 
 * OpenGL(GLSL) AVFilter   
 [How to use FFmpeg + OpenGL Filter/Effects/Transition?](./Plus-OpenGL-Patch/README.MD)
@@ -18,7 +24,7 @@
     * AV1
     * Opus
 
-## 1. Build
+## 1. 编译构建
 
 ### 1.1 FFmpeg + OpenGL + FLV(265/AV1/Opus)
 
@@ -42,7 +48,7 @@ bash build-only-opengl.sh
 bash build-with-flv_265-flv_av1_opus.sh
 ```
 
-## 2.Use
+## 2.使用
 
 ### 2.1 FFmpeg + OpenGL
 
@@ -50,7 +56,7 @@ bash build-with-flv_265-flv_av1_opus.sh
 
 ### 2.2 FFmpeg + FLV(265/AV1/Opus)
 
-#### Test FFmpeg H.265
+#### 测试 FFmpeg H.265
 
 * Execute Command
 
@@ -74,7 +80,7 @@ Input #0, flv, from 'hevctest.flv':
 
 
 
-#### Test FFmpeg Av1+Opus
+#### 测试 FFmpeg Av1+Opus
 
 * Execute Command
 

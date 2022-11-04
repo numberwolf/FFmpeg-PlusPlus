@@ -6,9 +6,10 @@
 * Support Transcode FLV with HEVC/AV1/Opus
 
 ## Contact
-QQ Group Number: contact 
-Email: porschegt23@foxmail.com
-WeChat: numberwolf11
+
+* QQ Group Number: contact 
+* Email: porschegt23@foxmail.com
+* WeChat: numberwolf11
 
 ## 0. Feature
 

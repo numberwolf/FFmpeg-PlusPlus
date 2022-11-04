@@ -5,6 +5,11 @@
 * OpenGL Filter for FFmpeg: Support Effects/Transition/Picture-in-Picture/LUT, Render video by your shaders(GLSL)
 * Support Transcode FLV with HEVC/AV1/Opus
 
+## Contact
+QQ Group Number: contact 
+Email: porschegt23@foxmail.com
+WeChat: numberwolf11
+
 ## 0. Feature
 
 * OpenGL(GLSL) AVFilter   

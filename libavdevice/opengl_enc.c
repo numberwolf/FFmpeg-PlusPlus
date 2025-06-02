@@ -479,7 +479,7 @@ static int av_cold opengl_load_procedures(OpenGLContext *opengl)
     procs->glCreateShader = glCreateShader;
     procs->glDeleteShader = glDeleteShader;
     procs->glCompileShader = glCompileShader;
-    procs->glShaderSource = glShaderSource;
+    procs->glShaderSource = (FF_PFNGLSHADERSOURCEPROC) glShaderSource;
     procs->glGetShaderiv = glGetShaderiv;
     procs->glGetShaderInfoLog = glGetShaderInfoLog;
     procs->glEnableVertexAttribArray = glEnableVertexAttribArray;

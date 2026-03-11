@@ -105,6 +105,7 @@ enum {
 };
 
 enum {
+    FLV_CODECID_HEVC_LEGACY = 0,
     FLV_CODECID_H263    = 2,
     FLV_CODECID_SCREEN  = 3,
     FLV_CODECID_VP6     = 4,
@@ -115,6 +116,7 @@ enum {
     FLV_CODECID_MPEG4   = 9,
     FLV_CODECID_HEVC    = 12,
     FLV_CODECID_AV1     = 13,
+    FLV_CODECID_HEVC_ALT = 14,
 };
 
 enum {

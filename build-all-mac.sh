@@ -5,6 +5,13 @@ set -x
 BASEPATH=`pwd`
 OUTPUT=${BASEPATH}/output
 
+# Avoid pulling headers/pkg-config files from a previously installed local build.
+unset CPATH
+unset C_INCLUDE_PATH
+unset CPLUS_INCLUDE_PATH
+unset OBJC_INCLUDE_PATH
+unset PKG_CONFIG_PATH
+
 if [ ! -d $OUTPUT ]; then
     mkdir -p $OUTPUT
 fi
@@ -15,18 +22,19 @@ cp $FFMPEG_GL_PATCH_PATH/Plus-GL-Shader/vf_plusglshader.c ./libavfilter/
 cp $FFMPEG_GL_PATCH_PATH/Plus-GL-Shader/vf_lutglshader.c ./libavfilter/
 cp $FFMPEG_GL_PATCH_PATH/Plus-GL-Shader/vf_pipglshader.c ./libavfilter/
 
-#make clean
+SDL2_PATH=$(brew --prefix sdl2)
 
 #:<<!
 ./configure \
   --prefix=${OUTPUT} \
   --enable-cross-compile \
   --pkg-config-flags="--static" \
-  --extra-ldflags="-lm -lz -llzma -lpthread -L$(brew --prefix glew)/lib -L$(brew --prefix glfw)/lib -lGLEW -lglfw -L$(brew --prefix lame)/lib" \
-  --extra-cflags="-I$(brew --prefix glew)/include -I$(brew --prefix glfw)/include -I$(brew --prefix lame)/include" \
+  --extra-ldflags="-lm -lz -llzma -lpthread -L$(brew --prefix glew)/lib -L$(brew --prefix glfw)/lib -lGLEW -lglfw -L$(brew --prefix lame)/lib -L$SDL2_PATH/lib" \
+  --extra-cflags="-O3 -fno-strict-aliasing -fPIC -I$(brew --prefix glew)/include -I$(brew --prefix glfw)/include -I$(brew --prefix lame)/include -I$SDL2_PATH/include" \
   --extra-libs=-lpthread \
   --extra-libs=-lm \
   --enable-gpl \
+  --enable-ffplay \
   --enable-libfdk_aac \
   --enable-libfreetype \
   --enable-libmp3lame \
@@ -61,3 +69,4 @@ cp $FFMPEG_GL_PATCH_PATH/Plus-GL-Shader/vf_pipglshader.c ./libavfilter/
 #make clean
 make -j16
 #sudo make install
+make install

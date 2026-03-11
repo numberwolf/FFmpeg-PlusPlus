@@ -44,6 +44,7 @@ HEADERS = adler32.h                                                     \
           hwcontext_videotoolbox.h                                      \
           hwcontext_vdpau.h                                             \
           imgutils.h                                                    \
+          intmath.h                                                     \
           intfloat.h                                                    \
           intreadwrite.h                                                \
           lfg.h                                                         \
@@ -84,7 +85,6 @@ HEADERS = adler32.h                                                     \
 HEADERS-$(CONFIG_LZO)                   += lzo.h
 
 ARCH_HEADERS = bswap.h                                                  \
-               intmath.h                                                \
                intreadwrite.h                                           \
                timer.h                                                  \
 

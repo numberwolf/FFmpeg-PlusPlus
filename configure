@@ -1980,6 +1980,7 @@ ARCH_LIST="
     tilegx
     tilepro
     tomi
+    wasm
     x86
     x86_32
     x86_64
@@ -2013,6 +2014,10 @@ ARCH_EXT_LIST_LOONGSON="
     loongson2
     loongson3
     mmi
+"
+
+ARCH_EXT_LIST_WASM="
+    simd128
 "
 
 ARCH_EXT_LIST_X86_SIMD="
@@ -2053,6 +2058,7 @@ ARCH_EXT_LIST_X86="
 ARCH_EXT_LIST="
     $ARCH_EXT_LIST_ARM
     $ARCH_EXT_LIST_PPC
+    $ARCH_EXT_LIST_WASM
     $ARCH_EXT_LIST_X86
     $ARCH_EXT_LIST_MIPS
     $ARCH_EXT_LIST_LOONGSON
@@ -2540,6 +2546,8 @@ msa2_deps="msa"
 cpunop_deps="i686"
 x86_64_select="i686"
 x86_64_suggest="fast_cmov"
+
+simd128_deps="wasm"
 
 amd3dnow_deps="mmx"
 amd3dnowext_deps="amd3dnow"
@@ -4804,6 +4812,9 @@ case "$arch" in
     tilegx|tile-gx)
         arch="tilegx"
     ;;
+    wasm*)
+        arch="wasm"
+    ;;
     i[3-6]86*|i86pc|BePC|x86pc|x86_64|x86_32|amd64)
         arch="x86"
     ;;
@@ -5702,6 +5713,10 @@ if enabled aarch64; then
 
     map 'enabled_any ${v}_external ${v}_inline || disable $v' $ARCH_EXT_LIST_ARM
 
+elif enabled wasm; then
+
+    enabled simd128 && check_cc simd128 wasm_simd128.h  "v128_t v = wasm_v128_load(0);"
+
 elif enabled alpha; then
 
     check_cflags -mieee
@@ -6383,12 +6398,12 @@ fi
 
 if enabled sdl2; then
     SDL2_CONFIG="${cross_prefix}sdl2-config"
-    test_pkg_config sdl2 "sdl2 >= 2.0.1 sdl2 < 2.1.0" SDL_events.h SDL_PollEvent
+    test_pkg_config sdl2 "sdl2 >= 2.0.1 sdl2 < 3.0.0" SDL_events.h SDL_PollEvent
     if disabled sdl2 && "${SDL2_CONFIG}" --version > /dev/null 2>&1; then
         sdl2_cflags=$("${SDL2_CONFIG}" --cflags)
         sdl2_extralibs=$("${SDL2_CONFIG}" --libs)
         test_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) >= 0x020001" $sdl2_cflags &&
-        test_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) < 0x020100" $sdl2_cflags &&
+        test_cpp_condition SDL.h "(SDL_MAJOR_VERSION<<16 | SDL_MINOR_VERSION<<8 | SDL_PATCHLEVEL) < 0x030000" $sdl2_cflags &&
         check_func_headers SDL_events.h SDL_PollEvent $sdl2_extralibs $sdl2_cflags &&
             enable sdl2
     fi
